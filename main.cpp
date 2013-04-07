@@ -14,17 +14,18 @@
 // #include "dns_client.h"
 #include "dbus_server.h"
 
-#include "log4cxx/logger.h"
-#include "log4cxx/basicconfigurator.h"
-#include "log4cxx/helpers/exception.h"
+#include <log4cxx/logger.h>
+#include <log4cxx/helpers/pool.h>
+#include <log4cxx/basicconfigurator.h>
+#include <log4cxx/fileappender.h>
+#include <log4cxx/patternlayout.h>
+log4cxx::LoggerPtr logger = log4cxx::Logger::getLogger("Main");
 
-using namespace log4cxx;
-using namespace log4cxx::helpers;
-LoggerPtr logger(Logger::getLogger("Main"));
-
+bool			enabled_debug = false;
 bool			has_to_daemonize = false;
 bool			has_to_write_pid_file = false;
 const char *	pid_file_path = "/var/run/douaned.pid";
+const char *	log_file_path = "/var/log/douane.log";
 
 NetlinkListener	netlink_listener;
 
@@ -101,6 +102,13 @@ void do_from_options(std::string option, const char * optarg)
 		has_to_write_pid_file = true;
 		if (optarg)
 			pid_file_path = optarg;
+	} else if (option == "log-file")
+	{
+		if (optarg)
+			log_file_path = optarg;
+	} else if (option == "debug")
+	{
+		enabled_debug = true;
 	}
 }
 
@@ -118,6 +126,12 @@ int on_cmd(const Glib::RefPtr<Gio::ApplicationCommandLine> &, Glib::RefPtr<Gtk::
 
 int main(int argc, char * argv[])
 {
+	// CTRL + C catcher
+	signal(SIGINT, handler);
+
+	// Force the nice value to -20 (urgent)
+	nice(-20);
+
 	/**
 	 *  Application options handling with long options support.
 	 */
@@ -128,10 +142,12 @@ int main(int argc, char * argv[])
 		{"version",  no_argument,       0, 'v'},
 		{"help",     no_argument,       0, 'h'},
 		{"pid-file", optional_argument, 0, 'p'},
+		{"log-file", required_argument, 0, 'l'},
+		{"debug",    no_argument       , 0, 'D'},
 		{0,0,0,0}
 	};
 	int option_index = 0;
-	while ((c = getopt_long(argc, argv, "dvhp:", long_options, &option_index)) != -1)
+	while ((c = getopt_long(argc, argv, "dvhp:l:D", long_options, &option_index)) != -1)
 	{
 		switch (c)
 		{
@@ -150,6 +166,12 @@ int main(int argc, char * argv[])
 			case 'p':
 				do_from_options("pid-file", optarg);
 				break;
+			case 'l':
+				do_from_options("log-file", optarg);
+				break;
+			case 'D':
+				do_from_options("debug", optarg);
+				break;
 			case '?':
 				std::cout << std::endl << "To get help execute me with --help" << std::endl;
 				exit(1);
@@ -159,7 +181,27 @@ int main(int argc, char * argv[])
 		}
 	}
 
+	/**
+	 *  log4cxx configuration
+	 *
+	 *  Appending logs to the file /var/log/douane.log
+	 */
+	log4cxx::PatternLayoutPtr pattern = new log4cxx::PatternLayout(
+		enabled_debug ? "%d{dd/MM/yyyy HH:mm:ss} | %5p | [%F::%c:%L]: %m%n" : "%d{dd/MM/yyyy HH:mm:ss} %5p: %m%n"
+	);
+	log4cxx::FileAppender * fileAppender = new log4cxx::FileAppender(
+		log4cxx::LayoutPtr(pattern),
+		log_file_path
+	);
+	log4cxx::helpers::Pool p;
+	fileAppender->activateOptions(p);
+	log4cxx::BasicConfigurator::configure(log4cxx::AppenderPtr(fileAppender));
+	log4cxx::Logger::getRootLogger()->setLevel(enabled_debug ? log4cxx::Level::getDebug() : log4cxx::Level::getInfo());
+	log4cxx::LoggerPtr logger = log4cxx::Logger::getLogger("logger");
+	/**
+	 */
 
+	// Daemonize the application if --daemon argument is passed
 	if (has_to_daemonize)
 	{
 		do_daemonize();
@@ -169,15 +211,6 @@ int main(int argc, char * argv[])
 	{
 		do_pidfile(pid_file_path);
 	}
-
-	// log4cxx configuration
-	BasicConfigurator::configure();
-
-	// CTRL + C catcher
-	signal(SIGINT, handler);
-
-	// Force the nice value to -20 (urgent)
-	nice(-20);
 
 	// Standard Gtkmm initialization of the application that will be used to execute the GTK stuff
 	Glib::RefPtr<Gtk::Application>	application = Gtk::Application::create(
