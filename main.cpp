@@ -48,6 +48,14 @@ void do_daemonize(void)
 		}
 		case 0:
 		{
+			//unmask the file mode
+			umask(0);
+
+			if(setsid() < 0)
+			{
+				// Return failure
+				exit(1);
+			}
 			break;
 		}
 		default:
@@ -197,86 +205,114 @@ int main(int argc, char * argv[])
 	fileAppender->activateOptions(p);
 	log4cxx::BasicConfigurator::configure(log4cxx::AppenderPtr(fileAppender));
 	log4cxx::Logger::getRootLogger()->setLevel(enabled_debug ? log4cxx::Level::getDebug() : log4cxx::Level::getInfo());
-	log4cxx::LoggerPtr logger = log4cxx::Logger::getLogger("logger");
 	/**
 	 */
 
-	// Daemonize the application if --daemon argument is passed
-	if (has_to_daemonize)
+
+	try {
+		// Daemonize the application if --daemon argument is passed
+		if (has_to_daemonize)
+		{
+			do_daemonize();
+			LOG4CXX_INFO(logger, "A deamon process has been created");
+		}
+
+		if (has_to_write_pid_file)
+		{
+			do_pidfile(pid_file_path);
+			LOG4CXX_INFO(logger, "A pid file with PID " << getpid() << " is created at " << pid_file_path);
+		}
+
+		LOG4CXX_INFO(logger, "A log file is created at " << log_file_path);
+
+		if (enabled_debug)
+			LOG4CXX_DEBUG(logger, "The debug mode is enabled");
+
+
+		LOG4CXX_DEBUG(logger, "Gtk::Application::create()");
+		// Standard Gtkmm initialization of the application that will be used to execute the GTK stuff
+		Glib::RefPtr<Gtk::Application>	application = Gtk::Application::create(
+			argc,
+			argv,
+			"org.zedroot.Douane",
+			Gio::APPLICATION_HANDLES_COMMAND_LINE | Gio::APPLICATION_IS_SERVICE
+		);
+		application->signal_command_line().connect(sigc::bind(sigc::ptr_fun(on_cmd), application), false);
+
+		LOG4CXX_DEBUG(logger, "Initializing GTK window");
+		GtkQuestionWindow 				gtk_question_window(application);
+
+		/**
+		 *  DesktopFiles is a manager for freedesktop.org files
+		 *  (http://standards.freedesktop.org/autostart-spec/autostart-spec-latest.html#id2695912)
+		 */
+		LOG4CXX_DEBUG(logger, "Initializing DesktopFiles");
+		DesktopFiles 					desktop_files;
+
+		/**
+		 *  RulesManager is a "rules engine" that is responsible to store, ask and synchronize rules
+		 *  with the kernel module
+		 */
+		LOG4CXX_DEBUG(logger, "Initializing RulesManager");
+		RulesManager					rules_manager;
+
+		// DnsCache						dns_cache;
+
+		// When DnsClient emit looking_up_for_new_address signal then fire DnsCache::lookup_from_cache
+		// DnsClient::on_looking_up_for_new_address_connect(boost::bind(&DnsCache::lookup_from_cache, &dns_cache, _1));
+		// When DnsClient emit ip_address_resolution_done signal then fire DnsCache::update_cache
+		// DnsClient::on_ip_address_resolution_done_connect(boost::bind(&DnsCache::update_cache, &dns_cache, _1, _2));
+
+		LOG4CXX_DEBUG(logger, "Initializing ProcessesManager");
+		ProcessesManager				processes_manager;
+		processes_manager.set_desktop_files(&desktop_files);
+
+		// Assign the ProcessesManager instance to the NetlinkListener
+		netlink_listener.set_processes_manager(&processes_manager);
+
+
+		LOG4CXX_DEBUG(logger, "Connecting objects");
+		// When NetlinkListener emit connected_to_kernel_module signal then fire RulesManager::push_rules
+		netlink_listener.on_connected_to_kernel_module_connect(boost::bind(&RulesManager::push_rules, &rules_manager));
+
+		// When NetlinkMessageHandler emit new_network_activity signal then fire RulesManager::lookup_activity
+		NetlinkMessageHandler::on_new_network_activity_connect(boost::bind(&RulesManager::lookup_activity, &rules_manager, _1));
+
+		// When RulesManager emit new_unknown_activity signal then fire GtkQuestionWindow::add_activity
+		rules_manager.on_new_unknown_activity_connect(boost::bind(&GtkQuestionWindow::add_activity, &gtk_question_window, _1));
+
+		// When GtkQuestionWindow emit new_rule_validated signal then fire RulesManager::make_rule_from
+		gtk_question_window.on_new_rule_validated_connect(boost::bind(&RulesManager::make_rule_from, rules_manager, _1, _2));
+
+		// When RulesManager emit new_network_activity signal then fire NetlinkListener::send_rule
+		rules_manager.on_new_rule_created_connect(boost::bind(&NetlinkListener::send_rule, &netlink_listener, _1));
+
+		/**
+		 * D-Bus server initialization to publish data to external applications
+		 */
+		// DBusServer						dbus_server;
+
+		// Listener send all received activity to the D-Bus server so that it can fire a signal
+		// NetlinkMessageHandler::on_new_network_activity_connect(boost::bind(&DBusServer::new_network_activity, &dbus_server, _1));
+
+		// Start into a thread the D-Bus server
+		// dbus_server.start();
+
+		// Connect and listen to the Linux Kernel Module
+		LOG4CXX_DEBUG(logger, "Starting to listen to LKM");
+		netlink_listener.start();
+
+		LOG4CXX_DEBUG(logger, "Entering GTK loop");
+		return application->run(gtk_question_window);
+
+	} catch(const std::exception &e)
 	{
-		do_daemonize();
-	}
-
-	if (has_to_write_pid_file)
+		LOG4CXX_ERROR(logger, e.what());
+	} catch (const std::string &e)
 	{
-		do_pidfile(pid_file_path);
+		LOG4CXX_ERROR(logger, e);
+	} catch(...)
+	{
+		LOG4CXX_ERROR(logger, "Unknown error occured!");
 	}
-
-	// Standard Gtkmm initialization of the application that will be used to execute the GTK stuff
-	Glib::RefPtr<Gtk::Application>	application = Gtk::Application::create(
-		argc,
-		argv,
-		"org.zedroot.Douane",
-		Gio::APPLICATION_HANDLES_COMMAND_LINE | Gio::APPLICATION_IS_SERVICE
-	);
-	application->signal_command_line().connect(sigc::bind(sigc::ptr_fun(on_cmd), application), false);
-
-	GtkQuestionWindow 				gtk_question_window(application);
-
-	/**
-	 *  DesktopFiles is a manager for freedesktop.org files
-	 *  (http://standards.freedesktop.org/autostart-spec/autostart-spec-latest.html#id2695912)
-	 */
-	DesktopFiles 					desktop_files;
-
-	/**
-	 *  RulesManager is a "rules engine" that is responsible to store, ask and synchronize rules
-	 *  with the kernel module
-	 */
-	RulesManager					rules_manager;
-
-	// DnsCache						dns_cache;
-
-	// When DnsClient emit looking_up_for_new_address signal then fire DnsCache::lookup_from_cache
-	// DnsClient::on_looking_up_for_new_address_connect(boost::bind(&DnsCache::lookup_from_cache, &dns_cache, _1));
-	// When DnsClient emit ip_address_resolution_done signal then fire DnsCache::update_cache
-	// DnsClient::on_ip_address_resolution_done_connect(boost::bind(&DnsCache::update_cache, &dns_cache, _1, _2));
-
-	ProcessesManager				processes_manager;
-	processes_manager.set_desktop_files(&desktop_files);
-
-	// Assign the ProcessesManager instance to the NetlinkListener
-	netlink_listener.set_processes_manager(&processes_manager);
-
-
-	// When NetlinkListener emit connected_to_kernel_module signal then fire RulesManager::push_rules
-	netlink_listener.on_connected_to_kernel_module_connect(boost::bind(&RulesManager::push_rules, &rules_manager));
-
-	// When NetlinkMessageHandler emit new_network_activity signal then fire RulesManager::lookup_activity
-	NetlinkMessageHandler::on_new_network_activity_connect(boost::bind(&RulesManager::lookup_activity, &rules_manager, _1));
-
-	// When RulesManager emit new_unknown_activity signal then fire GtkQuestionWindow::add_activity
-	rules_manager.on_new_unknown_activity_connect(boost::bind(&GtkQuestionWindow::add_activity, &gtk_question_window, _1));
-
-	// When GtkQuestionWindow emit new_rule_validated signal then fire RulesManager::make_rule_from
-	gtk_question_window.on_new_rule_validated_connect(boost::bind(&RulesManager::make_rule_from, rules_manager, _1, _2));
-
-	// When RulesManager emit new_network_activity signal then fire NetlinkListener::send_rule
-	rules_manager.on_new_rule_created_connect(boost::bind(&NetlinkListener::send_rule, &netlink_listener, _1));
-
-	/**
-	 * D-Bus server initialization to publish data to external applications
-	 */
-	// DBusServer						dbus_server;
-
-	// Listener send all received activity to the D-Bus server so that it can fire a signal
-	// NetlinkMessageHandler::on_new_network_activity_connect(boost::bind(&DBusServer::new_network_activity, &dbus_server, _1));
-
-	// Start into a thread the D-Bus server
-	// dbus_server.start();
-
-	// Connect and listen to the Linux Kernel Module
-	netlink_listener.start();
-
-	return application->run(gtk_question_window);
 }

@@ -29,6 +29,8 @@ void NetlinkListener::execute(void)
 	struct iovec				iov;
 	struct network_activity *	activity_struct = (struct network_activity *) malloc(sizeof(struct network_activity));
 
+	LOG4CXX_DEBUG(logger, "NetlinkListener is now starting to listen to the LKM");
+
 	this->running = true;
 	while (this->running)
 	{
@@ -45,8 +47,11 @@ void NetlinkListener::execute(void)
 
 		memset(nlh, 0, NLMSG_SPACE(sizeof(struct network_activity)));
 
+		LOG4CXX_DEBUG(logger, "Waiting for new messages");
 		if (recvmsg(this->sock_fd, &msg, MSG_WAITALL) > 0)
 		{
+			LOG4CXX_DEBUG(logger, "New message from LKM");
+
 			memset(activity_struct, 0, sizeof(struct network_activity));
 			memcpy(activity_struct, NLMSG_DATA(nlh), sizeof(struct network_activity));
 
@@ -81,6 +86,9 @@ void NetlinkListener::send_hand_check(void)
 	struct network_activity * activity = this->build_message(KIND_HAND_CHECK);
 	// Assign some values
 	strcpy(activity->devise_name, "lo");
+
+	LOG4CXX_DEBUG(logger, "NetlinkListener is sending the hand check");
+
 	// Send it to the Kernel module
 	this->send_message(activity);
 }
