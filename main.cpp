@@ -234,7 +234,7 @@ int main(int argc, char * argv[])
 		Glib::RefPtr<Gtk::Application>	application = Gtk::Application::create(
 			argc,
 			argv,
-			"org.zedroot.Douane",
+			"org.zedroot.Douane.Application",
 			Gio::APPLICATION_HANDLES_COMMAND_LINE | Gio::APPLICATION_IS_SERVICE
 		);
 		application->signal_command_line().connect(sigc::bind(sigc::ptr_fun(on_cmd), application), false);
@@ -290,13 +290,13 @@ int main(int argc, char * argv[])
 		/**
 		 * D-Bus server initialization to publish data to external applications
 		 */
-		// DBusServer						dbus_server;
+		DBusServer						dbus_server;
 
 		// Listener send all received activity to the D-Bus server so that it can fire a signal
-		// NetlinkMessageHandler::on_new_network_activity_connect(boost::bind(&DBusServer::new_network_activity, &dbus_server, _1));
+		NetlinkMessageHandler::on_new_network_activity_connect(boost::bind(&DBusServer::new_network_activity, &dbus_server, _1));
 
 		// Start into a thread the D-Bus server
-		// dbus_server.start();
+		dbus_server.start();
 
 		// Connect and listen to the Linux Kernel Module
 		LOG4CXX_DEBUG(logger, "Starting to listen to LKM");
