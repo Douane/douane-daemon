@@ -21,26 +21,22 @@ STARTPIDFILE=$DOUANEDIR/logs/startpid
 case "$1" in
     start)
         log_daemon_msg "Starting the $NAME daemon"
-        log_daemon_msg "Checking PIDS folder..."
         if [ ! -e $PIDDIR ]; then
             mkdir $PIDDIR
             chown root $PIDDIR
         fi
-        log_daemon_msg "Building command line..."
-        FULL_COMMAND="start-stop-daemon --start --oknodo --startas $DAEMON --pidfile $PIDFILE -- --daemon --pid-file $PIDFILE"
+        FULL_COMMAND="start-stop-daemon --start --oknodo --startas $DAEMON --pidfile $PIDFILE -- --daemon --pid-file=$PIDFILE"
         if [ x"$DAEMON_USER" != x ]; then
-            log_daemon_msg "Executing command line as $DAEMON_USER"
             sudo -u $DAEMON_USER $FULL_COMMAND
         else
-            log_daemon_msg "Executing command line"
             $FULL_COMMAND
         fi
-        log_daemon_msg $FULL_COMMAND
         log_end_msg $?
         ;;
     stop)
         log_daemon_msg "Stopping $NAME daemon"
         start-stop-daemon --retry 30 --stop --pidfile $PIDFILE
+        if [ -a $PIDFILE ]; then rm $PIDFILE; fi;
         log_end_msg $?
         ;;
     status)
