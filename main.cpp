@@ -53,6 +53,7 @@ void do_daemonize(void)
 
 			if(setsid() < 0)
 			{
+				std::cout << "ERROR: Unable to set new session" << std::endl;
 				// Return failure
 				exit(1);
 			}
@@ -151,7 +152,7 @@ int main(int argc, char * argv[])
 		{"help",     no_argument,       0, 'h'},
 		{"pid-file", optional_argument, 0, 'p'},
 		{"log-file", required_argument, 0, 'l'},
-		{"debug",    no_argument       , 0, 'D'},
+		{"debug",    no_argument      , 0, 'D'},
 		{0,0,0,0}
 	};
 	int option_index = 0;
