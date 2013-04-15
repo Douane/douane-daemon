@@ -6,7 +6,6 @@ Douane::Douane(DBus::Connection &connection)
 {
 	LOG4CXX_DEBUG(logger, "Douane::Douane...");
 	DaemonVersion = "1.0.0";
-	DaemonStatus = DEAMON_STATUS_DISABLE;
 }
 
 Douane::~Douane()
@@ -26,14 +25,6 @@ void Douane::fire_new_activity(NetworkActivity * activity)
 	network_activity._7 = activity->size;
 
 	this->NewIncomingActivity(network_activity);
-}
-
-void Douane::SetStatus(const bool& state)
-{
-	if (state)
-		DaemonStatus = DEAMON_STATUS_ENABLE;
-	else
-		DaemonStatus = DEAMON_STATUS_DISABLE;
 }
 
 std::vector< ::DBus::Struct< std::string, bool > > Douane::GetRules()

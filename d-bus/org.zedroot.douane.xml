@@ -4,11 +4,7 @@
   <interface name="org.zedroot.Douane">
   	<!-- Properties -->
     <property name="DaemonVersion" type="s" access="read"/>
-    <property name="DaemonStatus" type="s" access="read"/>
     <!-- Methods -->
-    <method name="SetStatus">
-      <arg type="b" name="state" direction="in"/>
-    </method>
     <method name="GetRules">
       <arg type="a(sb)" name="rules" direction="out"/>
     </method>

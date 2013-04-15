@@ -5,9 +5,6 @@
 #include "org_zedroot_douane.h"
 #include "network_activity.h"
 
-#define DEAMON_STATUS_ENABLE "Enable"
-#define DEAMON_STATUS_DISABLE "Disable"
-
 /**
  *  Communicate with the Kernel module.
  */
@@ -37,11 +34,6 @@ class Douane :	public org::zedroot::Douane_adaptor,
 		/**
 		 *  Methods
 		 */
-
-		/**
-		 * Enable / Disable the Douane
-		 */
-		virtual void												SetStatus(const bool& state);
 
 		/**
 		 *  Return the list of sotred firewall rules
