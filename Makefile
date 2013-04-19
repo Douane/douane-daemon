@@ -27,6 +27,7 @@ OBJ=freedesktop/desktop_file.o \
 
 INSTALL=/usr/bin/install -c
 BINDIR=/opt/douane
+PIDSDIR=/opt/douane/pids
 EXEC=douaned
 
 all: $(EXEC)
@@ -47,3 +48,4 @@ install: $(EXEC)
 	test -d $(BINDIR) || mkdir $(BINDIR)
 	install -m 0500 $(EXEC) $(BINDIR)
 	install -m 0755 init.d/douane /etc/init.d/
+	install -m 0644 system.d/douane.conf /etc/dbus-1/system.d/

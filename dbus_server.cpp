@@ -19,7 +19,7 @@ void DBusServer::execute()
 {
 	LOG4CXX_DEBUG(logger, "Initializing D-Bus server...");
 	DBus::default_dispatcher = &this->dispatcher;
-	DBus::Connection bus = DBus::Connection::SessionBus();
+	DBus::Connection bus = DBus::Connection::SystemBus();
 	bus.request_name(DOUANE_SERVER_NAME);
 
 	this->douane = new Douane(bus);
