@@ -39,9 +39,14 @@ class Douane :	public org::zedroot::Douane_adaptor,
 		 */
 
 		/**
-		 *  Return the list of sotred firewall rules
+		 *  Return the list of firewall rules
 		 */
-		virtual std::vector< ::DBus::Struct< std::string, bool > >	GetRules();
+		virtual std::vector< ::DBus::Struct< std::string, std::string, bool > >	GetRules();
+
+		/**
+		 *  Deleted a rule
+		 */
+		virtual bool												DeleteRule(const std::string& rule_id);
 
 	private:
 		log4cxx::LoggerPtr											logger;

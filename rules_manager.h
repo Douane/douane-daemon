@@ -30,6 +30,7 @@ class RulesManager
 		int										save_rules(void) const;
 		int										load_rules_from_file(void);
 		void									push_rules(void) const;
+		bool									delete_rule_for_sha256(const std::string &executable_sha256);
 
 	private:
 		void								make_rule(const std::string executable_sha256, const std::string path, const bool allow);

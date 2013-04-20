@@ -6,7 +6,11 @@
     <property name="DaemonVersion" type="s" access="read"/>
     <!-- Methods -->
     <method name="GetRules">
-      <arg type="a(sb)" name="rules" direction="out"/>
+      <arg type="a(ssb)" name="rules" direction="out"/>
+    </method>
+    <method name="DeleteRule">
+      <arg type="s" name="rule_id" direction="in"/>
+      <arg type="b" name="result" direction="out"/>
     </method>
    	<!-- Signals -->
    	<signal name="NewIncomingActivity">

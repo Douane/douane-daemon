@@ -46,7 +46,7 @@ void RulesManager::lookup_activity(const NetworkActivity * activity)
 void RulesManager::make_rule(const std::string executable_sha256, const std::string path, const bool allow)
 {
 	// Save the rule in memory
-	this->valid_rules.insert(std::make_pair(executable_sha256, Rule(path, allow)));
+	this->valid_rules.insert(std::make_pair(executable_sha256, Rule(executable_sha256, path, allow)));
 
 	// Broadcast the created rule
 	this->new_rule_created(&this->valid_rules.find(executable_sha256)->second);
@@ -152,5 +152,22 @@ void RulesManager::push_rules(void) const
 	for(std::map<std::string, const Rule>::const_iterator it = this->valid_rules.begin(); it != this->valid_rules.end(); ++it)
 	{
 		this->new_rule_created(&it->second);
+	}
+}
+
+bool RulesManager::delete_rule_for_sha256(const std::string &executable_sha256)
+{
+	LOG4CXX_DEBUG(logger, "RulesManager::delete_rule_for_sha256");
+	LOG4CXX_DEBUG(logger, "executable_sha256: " << executable_sha256);
+
+	std::map<std::string, const Rule>::iterator it = this->valid_rules.find(executable_sha256);
+	if (it == this->valid_rules.end())
+	{
+		LOG4CXX_DEBUG(logger, "Rule not found!");
+		return false;
+	} else {
+		LOG4CXX_DEBUG(logger, "Rule found!");
+		this->valid_rules.erase(it);
+		return true;
 	}
 }

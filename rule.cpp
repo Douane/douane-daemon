@@ -1,7 +1,8 @@
 #include "rule.h"
 
-Rule::Rule(const std::string process_path, const bool allow)
-: process_path(process_path),
+Rule::Rule(const std::string executable_sha256, const std::string process_path, const bool allow)
+: executable_sha256(executable_sha256),
+  process_path(process_path),
   process_name(update_process_name_from_path()),
   allow(allow),
   logger(log4cxx::Logger::getLogger("Rule"))

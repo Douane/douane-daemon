@@ -8,13 +8,14 @@
 class Rule
 {
 	public:
-		Rule(const std::string process_path, const bool allow);
+		Rule(const std::string executable_sha256, const std::string process_path, const bool allow);
 
 		virtual ~Rule();
 
 		bool						is_allowed() const;
 		boost::property_tree::ptree	to_json() const;
 
+		const std::string			executable_sha256;
 		const std::string			process_path;
 		const std::string			process_name;
 		const bool					allow;
