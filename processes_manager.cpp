@@ -80,6 +80,7 @@ const std::string ProcessesManager::executable_to_string(std::string &path) cons
 		in.close();
 		return(contents.str());
 	}
+	LOG4CXX_ERROR(logger, "On opening " << path << ": " << strerror(errno));
 	throw(errno);
 }
 
