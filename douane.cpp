@@ -13,6 +13,11 @@ Douane::~Douane()
 
 }
 
+void Douane::set_rules_manager(RulesManager * rules_manager)
+{
+	this->rules_manager = rules_manager;
+}
+
 void Douane::fire_new_activity(NetworkActivity * activity)
 {
 	::DBus::Struct< std::string, std::string, std::string, int32_t, std::string, int32_t, int32_t > network_activity;
@@ -29,15 +34,18 @@ void Douane::fire_new_activity(NetworkActivity * activity)
 
 std::vector< ::DBus::Struct< std::string, bool > > Douane::GetRules()
 {
+	const std::map<std::string, const Rule> valid_rules = this->rules_manager->get_valid_rules();
 	LOG4CXX_DEBUG(logger, "Douane::GetRules...");
 
-	// ::DBus::Struct< std::string, bool > rule;
-	// rule._1 = "Test";
-	// rule._2 = true;
-
-	// this->NewIncomingActivity(rule);
-
 	std::vector< ::DBus::Struct< std::string, bool > > rules;
-	// rules.push_back(rule);
+	for(std::map<std::string, const Rule>::const_iterator it = valid_rules.begin(); it != valid_rules.end(); ++it)
+	{
+		::DBus::Struct< std::string, bool > rule;
+		rule._1 = it->second.process_path;
+		rule._2 = it->second.is_allowed();
+
+		rules.push_back(rule);
+	}
+
 	return rules;
 }

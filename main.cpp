@@ -292,6 +292,7 @@ int main(int argc, char * argv[])
 		 * D-Bus server initialization to publish data to external applications
 		 */
 		DBusServer						dbus_server;
+		dbus_server.set_rules_manager(&rules_manager);
 
 		// Listener send all received activity to the D-Bus server so that it can fire a signal
 		NetlinkMessageHandler::on_new_network_activity_connect(boost::bind(&DBusServer::new_network_activity, &dbus_server, _1));

@@ -5,7 +5,7 @@ DBusServer::DBusServer()
   dispatcher(DBus::BusDispatcher()),
   started(false)
 {
-
+	LOG4CXX_DEBUG(logger, "Initializing D-Bus server");
 }
 
 DBusServer::~DBusServer()
@@ -13,6 +13,12 @@ DBusServer::~DBusServer()
 	LOG4CXX_DEBUG(logger, "Shutting down D-Bus server..");
 	if (this->started)
 		this->dispatcher.leave();
+}
+
+void DBusServer::set_rules_manager(RulesManager * rules_manager)
+{
+	LOG4CXX_DEBUG(logger, "DBusServer::set_rules_manager...");
+	this->rules_manager = rules_manager;
 }
 
 void DBusServer::execute()
@@ -23,6 +29,7 @@ void DBusServer::execute()
 	bus.request_name(DOUANE_SERVER_NAME);
 
 	this->douane = new Douane(bus);
+	this->douane->set_rules_manager(this->rules_manager);
 
 	LOG4CXX_DEBUG(logger, "D-Bus server Initialized");
 

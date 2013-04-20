@@ -4,11 +4,17 @@ RulesManager::RulesManager()
 : logger(log4cxx::Logger::getLogger("RulesManager"))
 {
 	this->load_rules_from_file();
+	LOG4CXX_DEBUG(logger, "RulesManager initialization done");
 }
 
 RulesManager::~RulesManager()
 {
 
+}
+
+const std::map<std::string, const Rule> RulesManager::get_valid_rules(void) const
+{
+	return this->valid_rules;
 }
 
 const Rule * RulesManager::search_valid_rule_for(const NetworkActivity * activity) const
@@ -26,6 +32,7 @@ const Rule * RulesManager::search_valid_rule_for(const NetworkActivity * activit
 		return NULL;
 	}
 }
+
 void RulesManager::lookup_activity(const NetworkActivity * activity)
 {
 	const Rule * rule = this->search_valid_rule_for(activity);
@@ -95,6 +102,8 @@ int RulesManager::save_rules(void) const
 
 int RulesManager::load_rules_from_file(void)
 {
+	LOG4CXX_DEBUG(logger, "RulesManager::load_rules_from_file...");
+
 	boost::filesystem::path root_path = this->root_path();
 	root_path /= "rules";
 	std::ifstream rules_file;

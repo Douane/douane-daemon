@@ -25,6 +25,8 @@ class DBusServer : public Thread
 		 */
 		virtual ~DBusServer();
 
+		void				set_rules_manager(RulesManager * rules_manager);
+
 		/**
 		 *  Start a D-Bus Server
 		 */
@@ -41,6 +43,7 @@ class DBusServer : public Thread
 		DBus::BusDispatcher	dispatcher;
 		Douane *			douane;
 		bool				started;
+		RulesManager *		rules_manager;
 };
 
 #endif

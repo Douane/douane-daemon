@@ -4,6 +4,7 @@
 #include <log4cxx/logger.h>
 #include "org_zedroot_douane.h"
 #include "network_activity.h"
+#include "rules_manager.h"
 
 /**
  *  Communicate with the Kernel module.
@@ -24,6 +25,8 @@ class Douane :	public org::zedroot::Douane_adaptor,
 		 */
 		virtual ~Douane();
 
+		void														set_rules_manager(RulesManager * rules_manager);
+
 		/**
 		 *  Receive NetworkActivity from NetlinkListener instance
 		 *  Convert it to a DBus message
@@ -42,6 +45,7 @@ class Douane :	public org::zedroot::Douane_adaptor,
 
 	private:
 		log4cxx::LoggerPtr											logger;
+		RulesManager *												rules_manager;
 };
 
 #endif
