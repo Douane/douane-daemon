@@ -111,13 +111,13 @@ void GtkQuestionWindow::add_activity(const NetworkActivity * activity)
 		// Prevent to create 2 tabs for the same application if a lot of packets are coming in once
 		ThreadLock thread_lock(mutex);
 
-		std::map<std::string, const Process*>::const_iterator it = this->unknown_applications.find(activity->process->executable_sha256);
+		std::map<std::string, const Process*>::const_iterator it = this->unknown_applications.find(activity->process->get_executable_sha256());
 
 		// The NetworkActivity->Process point to an unknown application
 		if (it == this->unknown_applications.end())
 		{
 			// Register the new unknown application
-			this->unknown_applications.insert(std::make_pair(activity->process->executable_sha256, activity->process));
+			this->unknown_applications.insert(std::make_pair(activity->process->get_executable_sha256(), activity->process));
 
 			// Create a box in a new tab of the Gtk::Notebook
 			Gtk::manage(new GtkBoxUnknownApplication(activity))->append_to_notebook(this->m_Notebook);

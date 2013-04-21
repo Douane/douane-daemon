@@ -42,6 +42,7 @@ class NetlinkListener
 		static	boost::signals2::connection		on_connected_to_kernel_module_connect(const signalConnectedToKernelModuleType &slot);
 
 		void									send_rule(const Rule * rule);
+		void									delete_rule(const Rule * rule);
 		void									say_goodbye(void);
 
 	private:

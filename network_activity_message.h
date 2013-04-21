@@ -11,6 +11,7 @@
 #define KIND_HAND_CHECK		1
 #define KIND_SENDING_RULE	2
 #define KIND_GOODBYE		3
+#define KIND_DELETE_RULE	4
 
 /**
  *  Douane network activity message

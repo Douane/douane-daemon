@@ -101,10 +101,26 @@ void NetlinkListener::send_rule(const Rule * rule)
 	if (rule->allow)
 	{
 		// Assign some values
-		strcpy(activity->devise_name, "eth0");
+		strcpy(activity->devise_name, "lo");
 		std::copy(rule->process_path.begin(), rule->process_path.end(), activity->process_path);
 		std::copy(rule->process_name.begin(), rule->process_name.end(), activity->process_name);
 		activity->allowed = rule->is_allowed() ? 1 : 0;
+
+		// Send it to the Kernel module
+		this->send_message(activity);
+	}
+}
+
+void NetlinkListener::delete_rule(const Rule * rule)
+{
+	// Build a new message
+	struct network_activity * activity = this->build_message(KIND_DELETE_RULE);
+
+	if (rule->allow)
+	{
+		// Assign some values
+		strcpy(activity->devise_name, "lo");
+		std::copy(rule->process_path.begin(), rule->process_path.end(), activity->process_path);
 
 		// Send it to the Kernel module
 		this->send_message(activity);

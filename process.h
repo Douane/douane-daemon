@@ -4,19 +4,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <string.h>
-#include <errno.h>
 #include <stdexcept>
-#include <fstream>
 #include <sstream>
 #include <string>
 #include <iostream>
-#include <iomanip>
 #include <log4cxx/logger.h>
-#include <openssl/sha.h>
 #include <boost/lexical_cast.hpp> // boost::lexical_cast
 #include "freedesktop/desktop_files.h"
 #include "freedesktop/desktop_file.h"
+#include "tools.h"
 
 /**
  *  Error classes used to be thrown
@@ -36,8 +32,7 @@ class Process
 		/**
 		 *  Construct a Process from its PID
 		 */
-		Process(int pid);
-		Process(std::string &path);
+		Process(const pid_t pid);
 
 		/**
 		 *  Copy constructor
@@ -49,19 +44,21 @@ class Process
 		 */
 		virtual ~Process();
 
-		pid_t				process_pid;
-		std::string			executable_sha256;
+		const pid_t			process_pid;
 		std::string			path;
 		std::string			executable_name;
 		std::string			icon_name;
 		std::string			printable_name;
+		const std::string	get_executable_sha256(void) const { return this->executable_sha256; };
 
 	private:
 		log4cxx::LoggerPtr	logger;
 		std::string			proc_link;
+		std::string			executable_sha256;
 
 		void				build_from_pid(void);
 		void				try_get_process_path(void);
+		void				get_executable_name_from_path(void);
 };
 
 #endif

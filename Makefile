@@ -23,7 +23,8 @@ OBJ=freedesktop/desktop_file.o \
 	rule.o \
 	rules_manager.o \
 	socket.o \
-	thread.o
+	thread.o \
+	tools.o
 
 INSTALL=/usr/bin/install -c
 BINDIR=/opt/douane

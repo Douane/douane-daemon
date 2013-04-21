@@ -21,7 +21,7 @@ const Rule * RulesManager::search_valid_rule_for(const NetworkActivity * activit
 {
 	if (activity->process_has_been_detected())
 	{
-		std::map<std::string, const Rule>::const_iterator it = this->valid_rules.find(activity->process->executable_sha256);
+		std::map<std::string, const Rule>::const_iterator it = this->valid_rules.find(activity->process->get_executable_sha256());
 		if (it == this->valid_rules.end())
 		{
 			return NULL;
@@ -54,7 +54,7 @@ void RulesManager::make_rule(const std::string executable_sha256, const std::str
 
 void RulesManager::make_rule_from(const NetworkActivity * activity, bool allow)
 {
-	this->make_rule(activity->process->executable_sha256, activity->process->path, allow);
+	this->make_rule(activity->process->get_executable_sha256(), activity->process->path, allow);
 
 	// Write rules on disk
 	this->save_rules();
@@ -65,6 +65,12 @@ boost::signals2::connection RulesManager::on_new_rule_created_connect(const sign
 	return RulesManager::new_rule_created.connect(slot);
 }
 RulesManager::signalNewRuleCreated RulesManager::new_rule_created;
+
+boost::signals2::connection RulesManager::on_rule_deleted_connect(const signalRuleDeletedType &slot)
+{
+	return RulesManager::rule_deleted.connect(slot);
+}
+RulesManager::signalRuleDeleted RulesManager::rule_deleted;
 
 boost::signals2::connection RulesManager::on_new_unknown_activity_connect(const signalNewUnknownActivityType &slot)
 {
@@ -138,7 +144,6 @@ int RulesManager::load_rules_from_file(void)
 
 boost::filesystem::path RulesManager::root_path(void) const
 {
-	// Build the path $HOME/.douane
 	boost::filesystem::path root_path("/opt/douane");
 
 	// Ensure folder exists
@@ -157,17 +162,38 @@ void RulesManager::push_rules(void) const
 
 bool RulesManager::delete_rule_for_sha256(const std::string &executable_sha256)
 {
-	LOG4CXX_DEBUG(logger, "RulesManager::delete_rule_for_sha256");
-	LOG4CXX_DEBUG(logger, "executable_sha256: " << executable_sha256);
+	LOG4CXX_DEBUG(logger, "RulesManager::delete_rule_for_sha256...");
 
+	// Search the Rule instance for the given executable_sha256
 	std::map<std::string, const Rule>::iterator it = this->valid_rules.find(executable_sha256);
 	if (it == this->valid_rules.end())
 	{
-		LOG4CXX_DEBUG(logger, "Rule not found!");
+		// When not found return false so that the client is aware
 		return false;
 	} else {
-		LOG4CXX_DEBUG(logger, "Rule found!");
+		/**
+		 *  As it could be many rules for the same application (but different versions)
+		 *  the LKM is filering only the active/installed/running version of the application.
+		 *
+		 *  Until we aren't deleting the active/installed/running version rule we don't have to
+		 *  emit the rule_deleted signal.
+		 *  But when removing the active/installed/running version rule then we have to emit the signal.
+		 */
+		// Compare passed executable_sha256 with active/installed/running version executable SHA256
+		Tools tools;
+		const std::string running_executable_sha256 = tools.make_sha256_from(it->second.process_path);
+
+		LOG4CXX_DEBUG(logger, "executable_sha256: " << executable_sha256);
+		LOG4CXX_DEBUG(logger, "running_executable_sha256: " << running_executable_sha256);
+		if (executable_sha256 == running_executable_sha256)
+		{
+			this->rule_deleted(&it->second);
+		}
+
+		// In any cases remove the delete rule from the valid_rules std::map
 		this->valid_rules.erase(it);
+		// Save it to the disk
+		this->save_rules();
 		return true;
 	}
 }

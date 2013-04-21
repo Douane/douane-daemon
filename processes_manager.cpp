@@ -27,7 +27,7 @@ const Process * ProcessesManager::find_or_create_from_pid(pid_t process_id)
 		std::map<std::string, Process>::const_iterator it = this->processes.find(process.path);
 		if (it == this->processes.end())
 		{
-			const Process * new_process = this->make_new_process(process.path, process_id);
+			const Process * new_process = this->make_new_process(&process);
 
 			// Return a pointer of that new process
 			return new_process;
@@ -42,61 +42,22 @@ const Process * ProcessesManager::find_or_create_from_pid(pid_t process_id)
 	}
 }
 
-Process * ProcessesManager::make_new_process(std::string &path, pid_t process_id)
+Process * ProcessesManager::make_new_process(Process * new_process)
 {
-	Process process(path);
-
-	// This process is a new one, so complete it
-	process.process_pid = process_id;
-	process.executable_name = boost::filesystem::path(process.path).filename().string();
-
-	process.executable_sha256 = this->make_sha256_from(process.path);
-
-	const DesktopFile * desktop_file = this->desktop_files->find_desktop_file_by_application_name(process.executable_name);
+	const DesktopFile * desktop_file = this->desktop_files->find_desktop_file_by_application_name(new_process->executable_name);
 	if (desktop_file != NULL)
 	{
-		process.icon_name = desktop_file->get_icon();
-		process.printable_name = desktop_file->get_name();
+		new_process->icon_name = desktop_file->get_icon();
+		new_process->printable_name = desktop_file->get_name();
 	} else {
-		process.printable_name = "";
+		new_process->printable_name = "";
 	}
 
-	if (process.icon_name == "")
-		process.icon_name = "image-missing";
+	if (new_process->icon_name == "")
+		new_process->icon_name = "image-missing";
 
 	// Save that new process
-	this->processes.insert(std::make_pair(process.path, process));
+	this->processes.insert(std::make_pair(new_process->path, *new_process));
 
-	return &this->processes.find(process.path)->second;
-}
-
-const std::string ProcessesManager::executable_to_string(std::string &path) const
-{
-	std::ifstream in(path.c_str(), std::ios::in | std::ios::binary);
-	if (in)
-	{
-		std::ostringstream contents;
-		contents << in.rdbuf();
-		in.close();
-		return(contents.str());
-	}
-	LOG4CXX_ERROR(logger, "On opening " << path << ": " << strerror(errno));
-	throw(errno);
-}
-
-const std::string ProcessesManager::make_sha256_from(std::string &path) const
-{
-	const std::string file_content = this->executable_to_string(path);
-
-	unsigned char hash[SHA256_DIGEST_LENGTH];
-	SHA256_CTX sha256;
-	SHA256_Init(&sha256);
-	SHA256_Update(&sha256, file_content.c_str(), file_content.size());
-	SHA256_Final(hash, &sha256);
-	std::stringstream ss;
-	for(int i = 0; i < SHA256_DIGEST_LENGTH; i++)
-	{
-	    ss << std::hex << std::setw(2) << std::setfill('0') << (int)hash[i];
-	}
-	return ss.str();
+	return &this->processes.find(new_process->path)->second;
 }

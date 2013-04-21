@@ -16,9 +16,7 @@ class ProcessesManager
 		const Process *					find_or_create_from_pid(pid_t process_id);
 
 	private:
-		Process *						make_new_process(std::string &path, pid_t process_id);
-		const std::string				executable_to_string(std::string &path) const;
-		const std::string				make_sha256_from(std::string &path) const;
+		Process *						make_new_process(Process * new_process);
 
 		log4cxx::LoggerPtr				logger;
 		const DesktopFiles *			desktop_files;

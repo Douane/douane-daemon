@@ -288,6 +288,9 @@ int main(int argc, char * argv[])
 		// When RulesManager emit new_network_activity signal then fire NetlinkListener::send_rule
 		rules_manager.on_new_rule_created_connect(boost::bind(&NetlinkListener::send_rule, &netlink_listener, _1));
 
+		// When RulesManager emit rule_deleted signal then fire NetlinkListener::delete_rule
+		rules_manager.on_rule_deleted_connect(boost::bind(&NetlinkListener::delete_rule, &netlink_listener, _1));
+
 		/**
 		 * D-Bus server initialization to publish data to external applications
 		 */
