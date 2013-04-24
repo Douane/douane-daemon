@@ -162,8 +162,6 @@ void RulesManager::push_rules(void) const
 
 bool RulesManager::delete_rule_for_sha256(const std::string &executable_sha256)
 {
-	LOG4CXX_DEBUG(logger, "RulesManager::delete_rule_for_sha256...");
-
 	// Search the Rule instance for the given executable_sha256
 	std::map<std::string, const Rule>::iterator it = this->valid_rules.find(executable_sha256);
 	if (it == this->valid_rules.end())
@@ -183,10 +181,9 @@ bool RulesManager::delete_rule_for_sha256(const std::string &executable_sha256)
 		Tools tools;
 		const std::string running_executable_sha256 = tools.make_sha256_from(it->second.process_path);
 
-		LOG4CXX_DEBUG(logger, "executable_sha256: " << executable_sha256);
-		LOG4CXX_DEBUG(logger, "running_executable_sha256: " << running_executable_sha256);
 		if (executable_sha256 == running_executable_sha256)
 		{
+			LOG4CXX_DEBUG(logger, "Deleting rule with executable SHA256 " << executable_sha256);
 			this->rule_deleted(&it->second);
 		}
 

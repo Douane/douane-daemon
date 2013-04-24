@@ -47,11 +47,8 @@ void NetlinkListener::execute(void)
 
 		memset(nlh, 0, NLMSG_SPACE(sizeof(struct network_activity)));
 
-		LOG4CXX_DEBUG(logger, "Waiting for new messages");
 		if (recvmsg(this->sock_fd, &msg, MSG_WAITALL) > 0)
 		{
-			LOG4CXX_DEBUG(logger, "New message from LKM");
-
 			memset(activity_struct, 0, sizeof(struct network_activity));
 			memcpy(activity_struct, NLMSG_DATA(nlh), sizeof(struct network_activity));
 

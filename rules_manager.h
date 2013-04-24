@@ -37,16 +37,16 @@ class RulesManager
 		bool									delete_rule_for_sha256(const std::string &executable_sha256);
 
 	private:
-		void								make_rule(const std::string executable_sha256, const std::string path, const bool allow);
-		boost::filesystem::path				root_path(void) const;
+		void									make_rule(const std::string executable_sha256, const std::string path, const bool allow);
+		boost::filesystem::path					root_path(void) const;
 
-		log4cxx::LoggerPtr					logger;
-		std::map<std::string, const Rule>	valid_rules;
-		std::map<std::string, Rule>			pending_rules;
+		log4cxx::LoggerPtr						logger;
+		std::map<std::string, const Rule>		valid_rules;
+		std::map<std::string, Rule>				pending_rules;
 
-		static signalNewRuleCreated			new_rule_created;
-		static signalRuleDeleted			rule_deleted;
-		static signalNewUnknownActivity		new_unknown_activity;
+		static signalNewRuleCreated				new_rule_created;
+		static signalRuleDeleted				rule_deleted;
+		static signalNewUnknownActivity			new_unknown_activity;
 };
 
 #endif

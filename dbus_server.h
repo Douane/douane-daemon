@@ -18,19 +18,19 @@ class DBusServer : public Thread
 		/**
 		 *  Constructor
 		 */
-		DBusServer();
+		DBusServer(void);
 
 		/**
 		 *  Shutdown the D-Bus server.
 		 */
-		virtual ~DBusServer();
+		virtual ~DBusServer(void);
 
 		void				set_rules_manager(RulesManager * rules_manager);
 
 		/**
 		 *  Start a D-Bus Server
 		 */
-		void				execute();
+		void				execute(void);
 
 		/*
 		 *  Forward NetworkActivity instance to the D-Bus object Douane

@@ -256,6 +256,7 @@ int main(int argc, char * argv[])
 		 */
 		LOG4CXX_DEBUG(logger, "Initializing RulesManager");
 		RulesManager					rules_manager;
+		LOG4CXX_DEBUG(logger, "rules_manager: " << &rules_manager);
 
 		// DnsCache						dns_cache;
 
@@ -283,7 +284,7 @@ int main(int argc, char * argv[])
 		rules_manager.on_new_unknown_activity_connect(boost::bind(&GtkQuestionWindow::add_activity, &gtk_question_window, _1));
 
 		// When GtkQuestionWindow emit new_rule_validated signal then fire RulesManager::make_rule_from
-		gtk_question_window.on_new_rule_validated_connect(boost::bind(&RulesManager::make_rule_from, rules_manager, _1, _2));
+		gtk_question_window.on_new_rule_validated_connect(boost::bind(&RulesManager::make_rule_from, &rules_manager, _1, _2));
 
 		// When RulesManager emit new_network_activity signal then fire NetlinkListener::send_rule
 		rules_manager.on_new_rule_created_connect(boost::bind(&NetlinkListener::send_rule, &netlink_listener, _1));

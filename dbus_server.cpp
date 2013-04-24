@@ -1,6 +1,6 @@
 #include "dbus_server.h"
 
-DBusServer::DBusServer()
+DBusServer::DBusServer(void)
 : logger(log4cxx::Logger::getLogger("DBusServer")),
   dispatcher(DBus::BusDispatcher()),
   started(false)
@@ -17,7 +17,6 @@ DBusServer::~DBusServer()
 
 void DBusServer::set_rules_manager(RulesManager * rules_manager)
 {
-	LOG4CXX_DEBUG(logger, "DBusServer::set_rules_manager...");
 	this->rules_manager = rules_manager;
 }
 
