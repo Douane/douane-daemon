@@ -29,6 +29,7 @@ void Douane::fire_new_activity(NetworkActivity * activity)
 	network_activity._6 = activity->port_destination;
 	network_activity._7 = activity->size;
 
+	LOG4CXX_DEBUG(logger, "Emiting NewIncomingActivity DBus::SignalMessage with: " << network_activity._1 << ", " << network_activity._2 << ", " << network_activity._3 << ", " << network_activity._4 << ", " << network_activity._5 << ", " << network_activity._6 << ", " << network_activity._7 << ".");
 	this->NewIncomingActivity(network_activity);
 }
 
