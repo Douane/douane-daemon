@@ -35,9 +35,10 @@ const Process * ProcessesManager::find_or_create_from_pid(pid_t process_id)
 			// This process is already known so return its pointer
 			return &it->second;
 		}
-	} catch (ProcessException exception)
+	} catch (const ProcessException &exception)
 	{
 		// Process raise due to a no such file or no enough permissions error
+		LOG4CXX_ERROR(logger, "Unable to build process for PID " << process_id << ": " << exception.what());
 		return NULL;
 	}
 }

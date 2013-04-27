@@ -30,7 +30,7 @@ boost::property_tree::ptree Rule::to_json() const
 
 std::string Rule::update_process_name_from_path(void) const
 {
-	char path[PATH_MAX * 4];
+	char path[PATH_MAX * 4] = "";
 	std::copy(this->process_path.begin(), this->process_path.end(), path);
 	return std::string(basename(path));
 }
