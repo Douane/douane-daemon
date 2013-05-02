@@ -1,7 +1,7 @@
 CC=g++
-PKGCONFIG=`pkg-config --cflags --libs liblog4cxx dbus-c++-1 gtkmm-3.0`
+PKGCONFIG=`pkg-config --cflags --libs liblog4cxx dbus-c++-1 gtkmm-3.0 libprocps`
 CFLAGS=-pedantic -Wall -W -g $(PKGCONFIG)
-LDFLAGS=$(PKGCONFIG) -lboost_signals -lboost_system -lboost_filesystem -lboost_regex -lpthread -lcrypto
+LDFLAGS=$(PKGCONFIG) -lboost_signals -lboost_system -lboost_filesystem -lboost_regex -lcrypto
 
 OBJ=freedesktop/desktop_file.o \
 	freedesktop/desktop_files.o \

@@ -37,7 +37,30 @@ const std::string Tools::make_sha256_from(const std::string &path) const
 	std::stringstream ss;
 	for(int i = 0; i < SHA256_DIGEST_LENGTH; i++)
 	{
-	    ss << std::hex << std::setw(2) << std::setfill('0') << (int)hash[i];
+		ss << std::hex << std::setw(2) << std::setfill('0') << (int)hash[i];
 	}
 	return ss.str();
+}
+
+pid_t Tools::process_pid_from_process_name(const std::string &name) const
+{
+	proc_t		proc_info;
+	pid_t		task_tgid = 0;
+
+	PROCTAB *	proc = openproc(PROC_FILLMEM | PROC_FILLSTAT | PROC_FILLSTATUS);
+
+	memset(&proc_info, 0, sizeof(proc_info));
+	while (readproc(proc, &proc_info) != NULL)
+	{
+		if (name == proc_info.cmd)
+		{
+			task_tgid = proc_info.tgid;
+			LOG4CXX_DEBUG(logger, name << " has PID " << task_tgid);
+			break;
+		}
+	}
+
+	closeproc(proc);
+
+	return task_tgid;
 }

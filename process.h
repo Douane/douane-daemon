@@ -10,8 +10,9 @@
 #include <iostream>
 #include <log4cxx/logger.h>
 #include <boost/lexical_cast.hpp> // boost::lexical_cast
-#include "freedesktop/desktop_files.h"
-#include "freedesktop/desktop_file.h"
+#include <boost/filesystem/path.hpp> // boost::filesystem::path
+#include <boost/filesystem/operations.hpp> // boost::filesystem::read_symlink
+#include <sys/stat.h>
 #include "tools.h"
 
 /**

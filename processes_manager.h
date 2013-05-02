@@ -3,6 +3,8 @@
 
 #include <log4cxx/logger.h>
 #include "process.h"
+#include "freedesktop/desktop_files.h"
+#include "freedesktop/desktop_file.h"
 
 class ProcessesManager
 {

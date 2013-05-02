@@ -4,6 +4,7 @@
 #include <log4cxx/logger.h>
 #include <boost/property_tree/json_parser.hpp>
 #include <libgen.h>
+#include "tools.h"
 
 class Rule
 {
@@ -14,6 +15,7 @@ class Rule
 
 		bool						is_allowed() const;
 		boost::property_tree::ptree	to_json() const;
+		pid_t						find_and_update_process_pid(void) const;
 
 		const std::string			executable_sha256;
 		const std::string			process_path;
