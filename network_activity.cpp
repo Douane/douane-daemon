@@ -4,26 +4,22 @@ NetworkActivity::NetworkActivity(struct network_activity * activity, ProcessesMa
 : logger(log4cxx::Logger::getLogger("NetworkActivity")),
   processes_manager(processes_manager)
 {
-	this->in_or_out			= activity->in_or_out;
 	this->devise_name		= activity->devise_name;
 	this->protocol			= this->protocol_name_from_id(activity->protocol);
-	this->process_id		= activity->process_id;
 	this->ip_source			= activity->ip_source;
 	this->port_source		= activity->port_source;
 	this->ip_destination	= activity->ip_destination;
 	this->port_destination	= activity->port_destination;
 	this->size				= activity->size;
 
-	this->process = this->processes_manager->find_or_create_from_pid(this->process_id);
+	this->process = this->processes_manager->find_or_create_from_path(activity->process_path);
 }
 
 NetworkActivity::NetworkActivity(const NetworkActivity &activity)
 : logger(log4cxx::Logger::getLogger("NetworkActivity"))
 {
-	this->in_or_out			= activity.in_or_out;
 	this->devise_name		= activity.devise_name;
 	this->protocol			= activity.protocol;
-	this->process_id		= activity.process_id;
 	this->ip_source			= activity.ip_source;
 	this->port_source		= activity.port_source;
 	this->ip_destination	= activity.ip_destination;
@@ -33,9 +29,14 @@ NetworkActivity::NetworkActivity(const NetworkActivity &activity)
 	this->process			= activity.process;
 }
 
-NetworkActivity::~NetworkActivity()
+NetworkActivity::~NetworkActivity(void)
 {
 
+}
+
+bool NetworkActivity::process_has_been_detected(void) const
+{
+	return this->process != NULL;
 }
 
 const std::string NetworkActivity::str(void) const
@@ -43,20 +44,13 @@ const std::string NetworkActivity::str(void) const
 	std::stringstream os;
 
 	os << "[" << this->devise_name << "] " << this->protocol << " ";
+	os << this->ip_source << ":" << this->port_source;
+	os << " -> ";
+	os << this->ip_destination << ":" << this->port_destination;
+	os << " with a size of " << this->size;
 
-	if (this->incoming())
-	{
-		os << this->ip_destination << ":" << this->port_destination;
-		os << " <- ";
-		os << this->ip_source << ":" << this->port_source;
-	} else if (this->outcoming())
-	{
-		os << this->ip_source << ":" << this->port_source;
-		os << " -> ";
-		os << this->ip_destination << ":" << this->port_destination;
-	}
-
-	os << " with a size of " << this->size << " for process " << this->process_id;
+	if (this->process)
+		os << " for process " << this->process->path;
 
 	return os.str();
 }
@@ -74,16 +68,6 @@ std::string NetworkActivity::protocol_name_from_id(int id) const
 			os << "UNKNOWN id " << id;
 			return os.str();
 	}
-}
-
-bool NetworkActivity::incoming(void) const
-{
-	return this->in_or_out == INCOMING_PACKET;
-}
-
-bool NetworkActivity::outcoming(void) const
-{
-	return this->in_or_out == OUTCOMING_PACKET;
 }
 
 const std::string NetworkActivity::append_port_code(void) const

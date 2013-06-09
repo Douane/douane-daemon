@@ -31,9 +31,9 @@ class Process
 {
 	public:
 		/**
-		 *  Construct a Process from its PID
+		 *  Construct a Process from its path
 		 */
-		Process(const pid_t pid);
+		Process(std::string path);
 
 		/**
 		 *  Copy constructor
@@ -45,20 +45,18 @@ class Process
 		 */
 		virtual ~Process();
 
-		const pid_t			process_pid;
 		std::string			path;
 		std::string			executable_name;
 		std::string			icon_name;
 		std::string			printable_name;
-		const std::string	get_executable_sha256(void) const { return this->executable_sha256; };
+		const std::string	get_executable_sha256(void) const;
+		void				update_executable_sha256(void);
 
 	private:
 		log4cxx::LoggerPtr	logger;
-		std::string			proc_link;
 		std::string			executable_sha256;
 
-		void				build_from_pid(void);
-		void				try_get_process_path(void);
+		void				build_from_path(void);
 		void				get_executable_name_from_path(void);
 };
 

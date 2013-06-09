@@ -89,8 +89,8 @@ void GtkBoxUnknownApplication::build_box(void)
 	Gtk::Label * label_application_pid = Gtk::manage(new Gtk::Label());
 
 	std::stringstream application_pid;
-	application_pid << "Application PID was <b>";
-	application_pid << this->activity.process_id;
+	application_pid << "Application path <b>";
+	application_pid << this->activity.process->path;
 	application_pid << "</b>.";
 
 	label_application_pid->set_markup(application_pid.str());

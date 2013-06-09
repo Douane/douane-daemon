@@ -29,7 +29,7 @@ void NetlinkListener::execute(void)
 	struct iovec				iov;
 	struct network_activity *	activity_struct = (struct network_activity *) malloc(sizeof(struct network_activity));
 
-	LOG4CXX_DEBUG(logger, "NetlinkListener is now starting to listen to the LKM");
+	LOG4CXX_DEBUG(logger, "NetlinkListener is now listening to the LKM");
 
 	this->running = true;
 	while (this->running)
@@ -52,19 +52,24 @@ void NetlinkListener::execute(void)
 			memset(activity_struct, 0, sizeof(struct network_activity));
 			memcpy(activity_struct, NLMSG_DATA(nlh), sizeof(struct network_activity));
 
-			/**
-			 *  Build a NetworkActivity using received data from the Linux Kernel Module
-			 *
-			 *  The NetlinkMessageHandler will execute all other operations into a thread
-			 *  in order to respond immediately to the Linux Kernel Module.
-			 *
-			 *  Otherwise Linux Kernel Module method netlink_unicast() will return some
-			 *  error EAGAIN (-11) as the socket will be locked when trying to send another
-			 *  network activity.
-			 */
-			NetworkActivity * 		network_activity = new NetworkActivity(activity_struct, this->processes_manager);
-			NetlinkMessageHandler *	netlink_message_handler = new NetlinkMessageHandler(network_activity);
-			netlink_message_handler->start_and_detach();
+			if (std::string(activity_struct->process_path) == "")
+			{
+				LOG4CXX_WARN(logger, "Received activity_struct process_path is empty!");
+			} else {
+				/**
+				 *  Build a NetworkActivity using received data from the Linux Kernel Module
+				 *
+				 *  The NetlinkMessageHandler will execute all other operations into a thread
+				 *  in order to respond immediately to the Linux Kernel Module.
+				 *
+				 *  Otherwise Linux Kernel Module method netlink_unicast() will return some
+				 *  error EAGAIN (-11) as the socket will be locked when trying to send another
+				 *  network activity.
+				 */
+				NetworkActivity * 		network_activity = new NetworkActivity(activity_struct, this->processes_manager);
+				NetlinkMessageHandler *	netlink_message_handler = new NetlinkMessageHandler(network_activity);
+				netlink_message_handler->start_and_detach();
+			}
 		} else {
 			LOG4CXX_WARN(logger, "Wasn't able to receive the new activity: " << strerror(errno));
 		}
@@ -100,7 +105,6 @@ void NetlinkListener::send_rule(const Rule * rule)
 		// Assign some values
 		strcpy(activity->devise_name, "lo");
 		std::copy(rule->process_path.begin(), rule->process_path.end(), activity->process_path);
-		std::copy(rule->process_name.begin(), rule->process_name.end(), activity->process_name);
 		activity->allowed = rule->is_allowed() ? 1 : 0;
 
 		// Send it to the Kernel module

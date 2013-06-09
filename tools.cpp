@@ -11,7 +11,7 @@ Tools::~Tools()
 
 }
 
-const std::string Tools::executable_to_string(const std::string &path) const
+const std::string Tools::executable_to_string(const std::string & path) const
 {
 	std::ifstream in(path.c_str(), std::ios::in | std::ios::binary);
 	if (in)
@@ -25,7 +25,7 @@ const std::string Tools::executable_to_string(const std::string &path) const
 	throw(errno);
 }
 
-const std::string Tools::make_sha256_from(const std::string &path) const
+const std::string Tools::make_sha256_from(const std::string & path) const
 {
 	const std::string file_content = this->executable_to_string(path);
 
@@ -42,25 +42,9 @@ const std::string Tools::make_sha256_from(const std::string &path) const
 	return ss.str();
 }
 
-pid_t Tools::process_pid_from_process_name(const std::string &name) const
+bool Tools::is_number(const std::string& s) const
 {
-	proc_t		proc_info;
-	pid_t		task_tgid = 0;
-
-	PROCTAB *	proc = openproc(PROC_FILLMEM | PROC_FILLSTAT | PROC_FILLSTATUS);
-
-	memset(&proc_info, 0, sizeof(proc_info));
-	while (readproc(proc, &proc_info) != NULL)
-	{
-		if (name == proc_info.cmd)
-		{
-			task_tgid = proc_info.tgid;
-			LOG4CXX_DEBUG(logger, name << " has PID " << task_tgid);
-			break;
-		}
-	}
-
-	closeproc(proc);
-
-	return task_tgid;
+	std::string::const_iterator it = s.begin();
+	while (it != s.end() && std::isdigit(*it)) ++it;
+	return !s.empty() && it == s.end();
 }

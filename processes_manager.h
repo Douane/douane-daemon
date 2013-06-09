@@ -1,6 +1,7 @@
 #ifndef PROCESSES_MANAGER_H
 #define PROCESSES_MANAGER_H
 
+#include <dirent.h>
 #include <log4cxx/logger.h>
 #include "process.h"
 #include "freedesktop/desktop_files.h"
@@ -15,7 +16,7 @@ class ProcessesManager
 
 		void							set_desktop_files(const DesktopFiles * desktop_files);
 
-		const Process *					find_or_create_from_pid(pid_t process_id);
+		const Process *					find_or_create_from_path(const std::string & path);
 
 	private:
 		Process *						make_new_process(Process * new_process);

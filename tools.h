@@ -9,7 +9,6 @@
 #include <iomanip>			// setw(), setfill()
 #include <openssl/sha.h>
 #include <log4cxx/logger.h>
-#include <proc/readproc.h>	// openproc(), readproc()
 
 class Tools
 {
@@ -18,12 +17,12 @@ class Tools
 
 		virtual ~Tools();
 
-		const std::string	make_sha256_from(const std::string &path) const;
+		const std::string	make_sha256_from(const std::string & path) const;
 
-		pid_t				process_pid_from_process_name(const std::string &path) const;
+		bool				is_number(const std::string& s) const;
 
 	private:
-		const std::string	executable_to_string(const std::string &path) const;
+		const std::string	executable_to_string(const std::string & path) const;
 
 		log4cxx::LoggerPtr	logger;
 };

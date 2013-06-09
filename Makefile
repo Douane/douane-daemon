@@ -1,5 +1,5 @@
 CC=g++
-PKGCONFIG=`pkg-config --cflags --libs liblog4cxx dbus-c++-1 gtkmm-3.0 libprocps`
+PKGCONFIG=`pkg-config --cflags --libs liblog4cxx dbus-c++-1 gtkmm-3.0`
 CFLAGS=-pedantic -Wall -W -g $(PKGCONFIG)
 LDFLAGS=$(PKGCONFIG) -lboost_signals -lboost_system -lboost_filesystem -lboost_regex -lcrypto
 

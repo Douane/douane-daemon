@@ -32,7 +32,7 @@ class NetworkActivity
 		/**
 		 *  Destructor.
 		 */
-		virtual ~NetworkActivity();
+		virtual ~NetworkActivity(void);
 
 		/**
 		 *  Return a std::string describing the current network activity
@@ -67,16 +67,14 @@ class NetworkActivity
 		std::string							ip_destination;
 		int									port_destination;
 		int									size;
-		int									process_id;
 		std::string							hostname;
 
-		bool								process_has_been_detected(void) const { return this->process != NULL; };
+		bool								process_has_been_detected(void) const;
 
 	private:
 		log4cxx::LoggerPtr					logger;
 		ProcessesManager *					processes_manager;
 		boost::signals2::connection			update_signal;
-		int									in_or_out;
 		DnsClient *							dns_client;
 
 		std::string							protocol_name_from_id(int id) const;

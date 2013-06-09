@@ -24,8 +24,10 @@ const Rule * RulesManager::search_valid_rule_for(const NetworkActivity * activit
 		std::map<std::string, const Rule>::const_iterator it = this->valid_rules.find(activity->process->get_executable_sha256());
 		if (it == this->valid_rules.end())
 		{
+			LOG4CXX_DEBUG(logger, "No rule found for " << activity->process->path);
 			return NULL;
 		} else {
+			LOG4CXX_DEBUG(logger, "A" << (it->second.is_allowed() ? "n allowing" : " disallowing") << " rule found for " << activity->process->path);
 			return &it->second;
 		}
 	} else {
@@ -39,7 +41,9 @@ void RulesManager::lookup_activity(const NetworkActivity * activity)
 	if (rule == NULL)
 	{
 		if (activity->process_has_been_detected())
+		{
 			this->new_unknown_activity(activity);
+		}
 	}
 }
 
@@ -189,8 +193,10 @@ bool RulesManager::delete_rule_for_sha256(const std::string &executable_sha256)
 
 		// In any cases remove the delete rule from the valid_rules std::map
 		this->valid_rules.erase(it);
+
 		// Save it to the disk
 		this->save_rules();
+
 		return true;
 	}
 }
