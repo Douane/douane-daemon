@@ -25,41 +25,35 @@ public:
         register_method(Douane_adaptor, DeleteRule, _DeleteRule_stub);
     }
 
-    ::DBus::IntrospectedInterface *introspect() const
+    ::DBus::IntrospectedInterface *introspect() const 
     {
-        static ::DBus::IntrospectedArgument GetRules_args[] =
+        static ::DBus::IntrospectedArgument GetRules_args[] = 
         {
             { "rules", "a(ssb)", false },
             { 0, 0, 0 }
         };
-        static ::DBus::IntrospectedArgument DeleteRule_args[] =
+        static ::DBus::IntrospectedArgument DeleteRule_args[] = 
         {
             { "rule_id", "s", true },
             { "result", "b", false },
             { 0, 0, 0 }
         };
-        static ::DBus::IntrospectedArgument NewIncomingActivity_args[] =
-        {
-            { "activity", "(sssisii)", false },
-            { 0, 0, 0 }
-        };
-        static ::DBus::IntrospectedMethod Douane_adaptor_methods[] =
+        static ::DBus::IntrospectedMethod Douane_adaptor_methods[] = 
         {
             { "GetRules", GetRules_args },
             { "DeleteRule", DeleteRule_args },
             { 0, 0 }
         };
-        static ::DBus::IntrospectedMethod Douane_adaptor_signals[] =
+        static ::DBus::IntrospectedMethod Douane_adaptor_signals[] = 
         {
-            { "NewIncomingActivity", NewIncomingActivity_args },
             { 0, 0 }
         };
-        static ::DBus::IntrospectedProperty Douane_adaptor_properties[] =
+        static ::DBus::IntrospectedProperty Douane_adaptor_properties[] = 
         {
             { "DaemonVersion", "s", true, false },
             { 0, 0, 0, 0 }
         };
-        static ::DBus::IntrospectedInterface Douane_adaptor_interface =
+        static ::DBus::IntrospectedInterface Douane_adaptor_interface = 
         {
             "org.zedroot.Douane",
             Douane_adaptor_methods,
@@ -88,13 +82,6 @@ public:
 
     /* signal emitters for this interface
      */
-    void NewIncomingActivity(const ::DBus::Struct< std::string, std::string, std::string, int32_t, std::string, int32_t, int32_t >& arg1)
-    {
-        ::DBus::SignalMessage sig("NewIncomingActivity");
-        ::DBus::MessageIter wi = sig.writer();
-        wi << arg1;
-        emit_signal(sig);
-    }
 
 private:
 
@@ -102,6 +89,8 @@ private:
      */
     ::DBus::Message _GetRules_stub(const ::DBus::CallMessage &call)
     {
+        ::DBus::MessageIter ri = call.reader();
+
         std::vector< ::DBus::Struct< std::string, std::string, bool > > argout1 = GetRules();
         ::DBus::ReturnMessage reply(call);
         ::DBus::MessageIter wi = reply.writer();
@@ -121,5 +110,5 @@ private:
     }
 };
 
-} }
+} } 
 #endif //__dbusxx__org_zedroot_douane_h__ADAPTOR_MARSHAL_H

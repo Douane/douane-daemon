@@ -28,13 +28,6 @@ class Douane :	public org::zedroot::Douane_adaptor,
 		void														set_rules_manager(RulesManager * rules_manager);
 
 		/**
-		 *  Receive NetworkActivity from NetlinkListener instance
-		 *  Convert it to a DBus message
-		 *  Then fire the signal passing the message
-		 */
-		void														fire_new_activity(NetworkActivity * activity);
-
-		/**
 		 *  Methods
 		 */
 

@@ -18,21 +18,6 @@ void Douane::set_rules_manager(RulesManager * rules_manager)
 	this->rules_manager = rules_manager;
 }
 
-void Douane::fire_new_activity(NetworkActivity * activity)
-{
-	::DBus::Struct< std::string, std::string, std::string, int32_t, std::string, int32_t, int32_t > network_activity;
-	network_activity._1 = activity->devise_name;
-	network_activity._2 = activity->protocol;
-	network_activity._3 = activity->ip_source;
-	network_activity._4 = activity->port_source;
-	network_activity._5 = activity->ip_destination;
-	network_activity._6 = activity->port_destination;
-	network_activity._7 = activity->size;
-
-	LOG4CXX_DEBUG(logger, "Emiting NewIncomingActivity DBus::SignalMessage with: " << network_activity._1 << ", " << network_activity._2 << ", " << network_activity._3 << ", " << network_activity._4 << ", " << network_activity._5 << ", " << network_activity._6 << ", " << network_activity._7 << ".");
-	this->NewIncomingActivity(network_activity);
-}
-
 std::vector< ::DBus::Struct< std::string, std::string, bool > > Douane::GetRules()
 {
 	const std::map<std::string, const Rule> valid_rules = this->rules_manager->get_valid_rules();

@@ -39,5 +39,5 @@ void DBusServer::execute()
 
 void DBusServer::new_network_activity(NetworkActivity * activity) const
 {
-	this->douane->fire_new_activity(activity);
+	// TODO: Implement a signal in the D-Bus server to publish network activities.
 }

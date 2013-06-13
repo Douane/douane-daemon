@@ -12,9 +12,5 @@
       <arg type="s" name="rule_id" direction="in"/>
       <arg type="b" name="result" direction="out"/>
     </method>
-   	<!-- Signals -->
-   	<signal name="NewIncomingActivity">
-      <arg type="(sssisii)" name="activity"/>
-    </signal>
   </interface>
 </node>
