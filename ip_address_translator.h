@@ -10,16 +10,21 @@
 
 class IpAddressTranslator
 {
-	public:
-		IpAddressTranslator();
+  public:
+    /*
+    ** Constructors and Destructor
+    */
+    IpAddressTranslator(void);
+    virtual ~IpAddressTranslator(void);
 
-		virtual ~IpAddressTranslator();
+    /*
+    ** Class methods
+    */
+    static const std::string  translate(const std::string &ip_address);
 
-		static const std::string	translate(const std::string &ip_address);
-
-	private:
-		static const std::string	resolver(const std::string &ip_address);
-		log4cxx::LoggerPtr			logger;
+  private:
+    static const std::string  resolver(const std::string &ip_address);
+    log4cxx::LoggerPtr        logger;
 };
 
 #endif

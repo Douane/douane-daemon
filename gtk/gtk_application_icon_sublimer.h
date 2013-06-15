@@ -7,25 +7,24 @@
 
 class GtkApplicationIconSublimer : public Gtk::Image
 {
-	public:
-		/**
-		 *  Constructor
-		 */
-		GtkApplicationIconSublimer();
+  public:
+    /*
+    ** Constructors and Destructor
+    */
+    GtkApplicationIconSublimer(void);
+    virtual ~GtkApplicationIconSublimer(void);
 
-		/**
-		 *  Destructor.
-		 */
-		virtual ~GtkApplicationIconSublimer();
+    /*
+    ** Instance methods
+    */
+    void                      set_from_icon_name(Glib::ustring const &name);
 
-		void						set_from_icon_name(Glib::ustring const &name);
+  protected:
+    virtual bool              on_draw(const Cairo::RefPtr<Cairo::Context>& cr);
+    Glib::RefPtr<Gdk::Pixbuf> application_icon;
 
-	protected:
-		virtual bool				on_draw(const Cairo::RefPtr<Cairo::Context>& cr);
-		Glib::RefPtr<Gdk::Pixbuf>	application_icon;
-
-	private:
-		log4cxx::LoggerPtr			logger;
+  private:
+    log4cxx::LoggerPtr        logger;
 };
 
 #endif

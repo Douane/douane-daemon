@@ -9,41 +9,31 @@
 
 #define DOUANE_SERVER_NAME "org.zedroot.Douane"
 
-/**
- *  Expose methods to other applications through a D-Bus server.
- */
+/*
+**  Expose methods to other applications through a D-Bus server.
+*/
 class DBusServer : public Thread
 {
-	public:
-		/**
-		 *  Constructor
-		 */
-		DBusServer(void);
+  public:
+    /*
+    ** Constructors and Destructor
+    */
+    DBusServer(void);
+    virtual ~DBusServer(void);
 
-		/**
-		 *  Shutdown the D-Bus server.
-		 */
-		virtual ~DBusServer(void);
+    /*
+    ** Instance methods
+    */
+    void                set_rules_manager(RulesManager * rules_manager);
+    void                execute(void);
+    void                new_network_activity(NetworkActivity * activity) const;
 
-		void				set_rules_manager(RulesManager * rules_manager);
-
-		/**
-		 *  Start a D-Bus Server
-		 */
-		void				execute(void);
-
-		/*
-		 *  Forward NetworkActivity instance to the D-Bus object Douane
-		 *  so that it can fire the signal NewActivity.
-		 */
-		void				new_network_activity(NetworkActivity * activity) const;
-
-	private:
-		log4cxx::LoggerPtr	logger;
-		DBus::BusDispatcher	dispatcher;
-		Douane *			douane;
-		bool				started;
-		RulesManager *		rules_manager;
+  private:
+    log4cxx::LoggerPtr  logger;
+    DBus::BusDispatcher dispatcher;
+    Douane *            douane;
+    bool                started;
+    RulesManager *      rules_manager;
 };
 
 #endif

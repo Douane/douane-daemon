@@ -9,21 +9,25 @@
 
 class ProcessesManager
 {
-	public:
-		ProcessesManager();
+  public:
+    /*
+    ** Constructors and Destructor
+    */
+    ProcessesManager();
+    virtual ~ProcessesManager();
 
-		virtual ~ProcessesManager();
+    /*
+    ** Instance methods
+    */
+    void                            set_desktop_files(const DesktopFiles * desktop_files);
+    const Process *                 find_or_create_from_path(const std::string & path);
 
-		void							set_desktop_files(const DesktopFiles * desktop_files);
+  private:
+    log4cxx::LoggerPtr              logger;
+    const DesktopFiles *            desktop_files;
+    std::map<std::string, Process>  processes;
 
-		const Process *					find_or_create_from_path(const std::string & path);
-
-	private:
-		Process *						make_new_process(Process * new_process);
-
-		log4cxx::LoggerPtr				logger;
-		const DesktopFiles *			desktop_files;
-		std::map<std::string, Process>	processes;
+    Process *                       make_new_process(Process * new_process);
 };
 
 #endif

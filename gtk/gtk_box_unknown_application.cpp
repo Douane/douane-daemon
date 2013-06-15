@@ -114,6 +114,9 @@ void GtkBoxUnknownApplication::build_box(void)
 	buttonbox_allow_deny->pack_start(*button_deny, false, true, 0);
 	vbox_application_info_and_buttons->pack_start(*buttonbox_allow_deny, true, true, 0);
 
+	// About button
+	Gtk::Button * button_allow = Gtk::manage(new Gtk::Button("Allow"));
+
 	Glib::ustring icon_name(this->activity.process->icon_name);
 
 	/**

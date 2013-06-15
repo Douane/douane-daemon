@@ -14,17 +14,23 @@
 
 class DesktopFiles
 {
-	public:
-		DesktopFiles();
-		virtual	~DesktopFiles();
+  public:
+    /*
+    ** Constructors and Destructor
+    */
+    DesktopFiles();
+    virtual ~DesktopFiles();
 
-		const DesktopFile *					find_desktop_file_by_application_name(const std::string name) const;
+    /*
+    ** Instance methods
+    */
+    const DesktopFile *                 find_desktop_file_by_application_name(const std::string name) const;
 
-	private:
-		log4cxx::LoggerPtr					logger;
-		std::map<std::string, DesktopFile>	desktop_files;
+  private:
+    log4cxx::LoggerPtr                  logger;
+    std::map<std::string, DesktopFile>  desktop_files;
 
-		void								load_desktop_files(void);
+    void                                load_desktop_files(void);
 };
 
 #endif

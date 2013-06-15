@@ -9,55 +9,54 @@
 #include <string>
 #include <iostream>
 #include <log4cxx/logger.h>
-#include <boost/lexical_cast.hpp> // boost::lexical_cast
-#include <boost/filesystem/path.hpp> // boost::filesystem::path
-#include <boost/filesystem/operations.hpp> // boost::filesystem::read_symlink
+#include <boost/lexical_cast.hpp>           // boost::lexical_cast
+#include <boost/filesystem/path.hpp>        // boost::filesystem::path
+#include <boost/filesystem/operations.hpp>  // boost::filesystem::read_symlink
 #include <sys/stat.h>
 #include "tools.h"
 
-/**
- *  Error classes used to be thrown
- */
+/*
+**  Error classes used to be thrown
+*/
 class ProcessException : public std::runtime_error
 {
-	public:
-		ProcessException(std::string message) : std::runtime_error(message) { }
+  public:
+    ProcessException(std::string message) : std::runtime_error(message) { }
 };
 
-/**
- *  Represent the process that generated the network activity.
- */
+/*
+**  Represent the process that generated the network activity.
+*/
 class Process
 {
-	public:
-		/**
-		 *  Construct a Process from its path
-		 */
-		Process(std::string path);
+  public:
+    /*
+    ** Constructors and Destructor
+    */
+    Process(std::string path);
+    Process(const Process &process);
+    virtual ~Process();
 
-		/**
-		 *  Copy constructor
-		 */
-		Process(const Process &process);
+    /*
+    ** Instance methods
+    */
+    const std::string   get_executable_sha256(void) const;
+    void                update_executable_sha256(void);
 
-		/**
-		 *  Destructor.
-		 */
-		virtual ~Process();
+    /*
+    ** Attributes
+    */
+    std::string         path;
+    std::string         executable_name;
+    std::string         icon_name;
+    std::string         printable_name;
 
-		std::string			path;
-		std::string			executable_name;
-		std::string			icon_name;
-		std::string			printable_name;
-		const std::string	get_executable_sha256(void) const;
-		void				update_executable_sha256(void);
+  private:
+    log4cxx::LoggerPtr  logger;
+    std::string         executable_sha256;
 
-	private:
-		log4cxx::LoggerPtr	logger;
-		std::string			executable_sha256;
-
-		void				build_from_path(void);
-		void				get_executable_name_from_path(void);
+    void                build_from_path(void);
+    void                get_executable_name_from_path(void);
 };
 
 #endif

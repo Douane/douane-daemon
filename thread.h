@@ -5,14 +5,18 @@
 
 class Thread
 {
-	public:
-		void			start(void);
-		void			start_and_detach(void);
-		virtual void	execute(void);
-		void			wait_for_exit(void);
-	private:
-		void			create(bool detach);
-		pthread_t		handle;
+  public:
+    /*
+    ** Instance methods
+    */
+    void          start(void);
+    void          start_and_detach(void);
+    virtual void  execute(void);
+    void          wait_for_exit(void);
+
+  private:
+    void          create(bool detach);
+    pthread_t     handle;
 };
 
 #endif

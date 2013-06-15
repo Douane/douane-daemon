@@ -8,22 +8,31 @@
 
 class DesktopFile
 {
-	public:
-		DesktopFile(const boost::filesystem::path& path);
-		virtual ~DesktopFile();
+  public:
+    /*
+    ** Constructors and Destructor
+    */
+    DesktopFile(const boost::filesystem::path& path);
+    virtual ~DesktopFile(void);
 
-		boost::filesystem::path	path;
+    /*
+    ** Instance methods
+    */
+    const std::string                   get_icon(void) const;
+    const std::string                   get_exec(void) const;
+    const std::string                   get_name(void) const;
 
-		const std::string					get_icon(void) const;
-		const std::string					get_exec(void) const;
-		const std::string					get_name(void) const;
+    /*
+    ** Attributes
+    */
+    boost::filesystem::path             path;
 
-	private:
-		void 								parse_desktop_file(void);
-		const std::string					property_value_by_key(std::string key) const;
+  private:
+    log4cxx::LoggerPtr                  logger;
+    std::map<std::string, std::string>  propertiess;
 
-		log4cxx::LoggerPtr					logger;
-		std::map<std::string, std::string>	properties;
+    void                                parse_desktop_file(void);
+    const std::string                   property_value_by_key(std::string key) const;
 };
 
 #endif

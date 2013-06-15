@@ -10,44 +10,50 @@
 
 class GtkQuestionWindow : public Gtk::Window
 {
-	public:
-		typedef boost::signals2::signal<void(const NetworkActivity*, bool allowed)>	signalNewRuleValidated;
-		typedef signalNewRuleValidated::slot_type									signalNewRuleValidatedType;
+  public:
+    /*
+    ** Signals
+    */
+    typedef boost::signals2::signal<void(const NetworkActivity*, bool allowed)> signalNewRuleValidated;
+    typedef signalNewRuleValidated::slot_type                                   signalNewRuleValidatedType;
 
-		/**
-		 *  Constructor
-		 */
-		GtkQuestionWindow(const Glib::RefPtr<Gtk::Application> &application);
+    /*
+    ** Constructors and Destructor
+    */
+    GtkQuestionWindow(const Glib::RefPtr<Gtk::Application> &application);
+    virtual ~GtkQuestionWindow(void);
 
-		/**
-		 *  Destructor.
-		 */
-		virtual ~GtkQuestionWindow();
+    /*
+    ** Instance methods
+    */
+    bool                                  on_visibility_notify_event(GdkEventVisibility* event);
+    virtual bool                          on_delete_event(GdkEventAny *);
+    void                                  on_page_removed(Widget*, guint);
+    void                                  after_validate_rule(const NetworkActivity * activity, bool allowed);
+    bool                                  hide_question_window(void);
+    bool                                  show_question_window(void);
+    void                                  add_activity(const NetworkActivity * activity);
+    static boost::signals2::connection    on_new_rule_validated_connect(const signalNewRuleValidatedType &slot);
 
-		bool									on_visibility_notify_event(GdkEventVisibility* event);
-		virtual bool							on_delete_event(GdkEventAny *);
-		void									on_page_removed(Widget*, guint);
-		void									after_validate_rule(const NetworkActivity * activity, bool allowed);
-		bool									hide_question_window(void);
-		bool									show_question_window(void);
-		void									add_activity(const NetworkActivity * activity);
-		static boost::signals2::connection		on_new_rule_validated_connect(const signalNewRuleValidatedType &slot);
-		bool									is_shown;
+    /*
+    ** Attributes
+    */
+    bool                                  is_shown;
 
-	protected:
-		Gtk::Notebook *							m_Notebook;
+  protected:
+    Gtk::Notebook *                       m_Notebook;
 
-	private:
-		void									unhide(void);
+  private:
+    log4cxx::LoggerPtr                    logger;
+    std::map<std::string, const Process*> unknown_applications;
+    const Glib::RefPtr<Gtk::Application>  &application;
+    bool                                  accept_new_activities;
+    bool                                  has_received_activities;
+    pthread_mutex_t                       mutex;
 
-		log4cxx::LoggerPtr						logger;
-		std::map<std::string, const Process*>	unknown_applications;
-		const Glib::RefPtr<Gtk::Application>	&application;
-		bool									accept_new_activities;
-		bool									has_received_activities;
-		pthread_mutex_t							mutex;
+    void                                  unhide(void);
 
-		static signalNewRuleValidated			new_rule_validated;
+    static signalNewRuleValidated         new_rule_validated;
 };
 
 #endif

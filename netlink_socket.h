@@ -3,9 +3,9 @@
 
 #include "socket.h"
 
-/**
- *  Communicate with the Kernel module.
- */
+/*
+**  Communicate with the Kernel module.
+*/
 class NetlinkSocket : public Socket
 {
 	public:
