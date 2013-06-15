@@ -172,6 +172,8 @@ void GtkQuestionWindow::on_about_dialog_response(int response_id)
 void GtkQuestionWindow::make_about_dialog(void)
 {
   this->m_Dialog.set_transient_for(*this);
+  Glib::RefPtr<Gdk::Pixbuf> image = Gdk::Pixbuf::create_from_file("data/douane_128.png");
+  this->m_Dialog.set_logo(image);
   this->m_Dialog.set_program_name("Douane");
   this->m_Dialog.set_version("1.0.0");
   this->m_Dialog.set_copyright("Guillaume Hain");
