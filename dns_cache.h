@@ -21,8 +21,8 @@ class DnsCache
     /*
     ** Constructors and Destructor
     */
-    DnsCache();
-    virtual ~DnsCache();
+    DnsCache(void);
+    virtual ~DnsCache(void);
 
     /*
     ** Instance methods

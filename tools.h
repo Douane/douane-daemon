@@ -16,8 +16,8 @@ class Tools
     /*
     ** Constructors and Destructor
     */
-    Tools();
-    virtual ~Tools();
+    Tools(void);
+    virtual ~Tools(void);
 
     /*
     ** Instance methods

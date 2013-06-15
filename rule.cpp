@@ -10,27 +10,27 @@ Rule::Rule(const std::string executable_sha256, const std::string process_path, 
 
 }
 
-Rule::~Rule()
+Rule::~Rule(void)
 {
 
 }
 
-bool Rule::is_allowed() const
+bool Rule::is_allowed(void) const
 {
-	return this->allow;
+  return this->allow;
 }
 
-boost::property_tree::ptree Rule::to_json() const
+boost::property_tree::ptree Rule::to_json(void) const
 {
-	boost::property_tree::ptree rule;
-	rule.put("path", this->process_path);
-	rule.put("allowed", this->is_allowed());
-	return rule;
+  boost::property_tree::ptree rule;
+  rule.put("path", this->process_path);
+  rule.put("allowed", this->is_allowed());
+  return rule;
 }
 
 std::string Rule::update_process_name_from_path(void) const
 {
-	char path[PATH_MAX * 4] = "";
-	std::copy(this->process_path.begin(), this->process_path.end(), path);
-	return std::string(basename(path));
+  char path[PATH_MAX * 4] = "";
+  std::copy(this->process_path.begin(), this->process_path.end(), path);
+  return std::string(basename(path));
 }

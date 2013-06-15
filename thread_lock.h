@@ -4,10 +4,14 @@
 #include <pthread.h>
 
 class ThreadLock {
-	pthread_mutex_t &mutex;
-public:
-	ThreadLock(pthread_mutex_t &m) :mutex(m) { pthread_mutex_lock(&mutex); }
-	~ThreadLock() { pthread_mutex_unlock(&mutex); }
+  pthread_mutex_t &mutex;
+
+  public:
+    /*
+    ** Constructors and Destructor
+    */
+    ThreadLock(pthread_mutex_t &m) :mutex(m)  { pthread_mutex_lock(&mutex); }
+    ~ThreadLock(void)                         { pthread_mutex_unlock(&mutex); }
 };
 
 #endif

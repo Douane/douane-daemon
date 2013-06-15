@@ -8,20 +8,16 @@
 */
 class NetlinkSocket : public Socket
 {
-	public:
-		/**
-		 *  Construct a NetlinkSocket and initialize Netlink socket.
-		 *  @exception SocketException thrown if socket initialization failed.
-		 */
-		NetlinkSocket();
+  public:
 
-		/**
-		 *  Ensure Netlink socket is closed.
-		 */
-		virtual ~NetlinkSocket();
+    /*
+    ** Constructors and Destructor
+    */
+    NetlinkSocket(void);
+    virtual ~NetlinkSocket(void);
 
-	private:
-		log4cxx::LoggerPtr logger;
+  private:
+    log4cxx::LoggerPtr  logger;
 };
 
 #endif

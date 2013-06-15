@@ -18,8 +18,8 @@ class DesktopFiles
     /*
     ** Constructors and Destructor
     */
-    DesktopFiles();
-    virtual ~DesktopFiles();
+    DesktopFiles(void);
+    virtual ~DesktopFiles(void);
 
     /*
     ** Instance methods

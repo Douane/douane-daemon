@@ -13,13 +13,13 @@ class Rule
     ** Constructors and Destructor
     */
     Rule(const std::string executable_sha256, const std::string process_path, const bool allow);
-    virtual ~Rule();
+    virtual ~Rule(void);
 
     /*
     ** Instance methods
     */
-    bool                        is_allowed() const;
-    boost::property_tree::ptree to_json() const;
+    bool                        is_allowed(void) const;
+    boost::property_tree::ptree to_json(void) const;
     pid_t                       find_and_update_process_pid(void) const;
 
     const std::string           executable_sha256;

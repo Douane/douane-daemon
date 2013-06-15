@@ -35,7 +35,7 @@ class Process
     */
     Process(std::string path);
     Process(const Process &process);
-    virtual ~Process();
+    virtual ~Process(void);
 
     /*
     ** Instance methods

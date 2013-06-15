@@ -23,7 +23,7 @@ class DnsClient
     ** Constructors and Destructor
     */
     DnsClient(const std::string &ip_address);
-    virtual ~DnsClient();
+    virtual ~DnsClient(void);
 
     /*
     ** Instance methods

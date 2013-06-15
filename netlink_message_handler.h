@@ -12,25 +12,33 @@
 
 class NetlinkMessageHandler : public Thread
 {
-	public:
-		typedef boost::signals2::signal<void(NetworkActivity*)>	signalNewNetworkActivity;
-		typedef signalNewNetworkActivity::slot_type				signalNewNetworkActivityType;
+  public:
+    /*
+    ** Signals
+    */
+    typedef boost::signals2::signal<void(NetworkActivity*)> signalNewNetworkActivity;
+    typedef signalNewNetworkActivity::slot_type             signalNewNetworkActivityType;
 
-		NetlinkMessageHandler(NetworkActivity * network_activity);
+    /*
+    ** Constructors and Destructor
+    */
+    NetlinkMessageHandler(NetworkActivity * network_activity);
+    virtual ~NetlinkMessageHandler(void);
 
-		virtual ~NetlinkMessageHandler();
+    /*
+    ** Instance methods
+    */
+    void                                execute(void);
+    // Signals methods
+    static boost::signals2::connection  on_new_network_activity_connect(const signalNewNetworkActivityType &slot);
 
-		void								execute(void);
+  private:
+    log4cxx::LoggerPtr                  logger;
+    ProcessesManager *                  processes_manager;
+    NetworkActivity *                   network_activity;
+    struct network_activity *           activity_struct;
 
-		static	boost::signals2::connection	on_new_network_activity_connect(const signalNewNetworkActivityType &slot);
-
-	private:
-		log4cxx::LoggerPtr				logger;
-		ProcessesManager *				processes_manager;
-		NetworkActivity *				network_activity;
-		struct network_activity *		activity_struct;
-
-		static signalNewNetworkActivity	new_network_activity;
+    static signalNewNetworkActivity     new_network_activity;
 };
 
 #endif

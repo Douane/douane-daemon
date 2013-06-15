@@ -26,8 +26,8 @@ class RulesManager
     /*
     ** Constructors and Destructor
     */
-    RulesManager();
-    virtual ~RulesManager();
+    RulesManager(void);
+    virtual ~RulesManager(void);
 
     /*
     ** Instance methods

@@ -13,8 +13,8 @@ class ProcessesManager
     /*
     ** Constructors and Destructor
     */
-    ProcessesManager();
-    virtual ~ProcessesManager();
+    ProcessesManager(void);
+    virtual ~ProcessesManager(void);
 
     /*
     ** Instance methods
