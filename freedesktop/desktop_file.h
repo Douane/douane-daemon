@@ -29,7 +29,7 @@ class DesktopFile
 
   private:
     log4cxx::LoggerPtr                  logger;
-    std::map<std::string, std::string>  propertiess;
+    std::map<std::string, std::string>  properties;
 
     void                                parse_desktop_file(void);
     const std::string                   property_value_by_key(std::string key) const;

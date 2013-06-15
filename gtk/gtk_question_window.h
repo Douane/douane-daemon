@@ -30,9 +30,13 @@ class GtkQuestionWindow : public Gtk::Window
     virtual bool                          on_delete_event(GdkEventAny *);
     void                                  on_page_removed(Widget*, guint);
     void                                  after_validate_rule(const NetworkActivity * activity, bool allowed);
+    void                                  on_about_button_clicked(void);
+    void                                  on_hide_button_clicked(void);
     bool                                  hide_question_window(void);
     bool                                  show_question_window(void);
     void                                  add_activity(const NetworkActivity * activity);
+    void                                  on_about_dialog_response(int response_id);
+    // Signals methods
     static boost::signals2::connection    on_new_rule_validated_connect(const signalNewRuleValidatedType &slot);
 
     /*
@@ -41,7 +45,9 @@ class GtkQuestionWindow : public Gtk::Window
     bool                                  is_shown;
 
   protected:
+    Gtk::Box *                            m_Mainbox;
     Gtk::Notebook *                       m_Notebook;
+    Gtk::AboutDialog                      m_Dialog;
 
   private:
     log4cxx::LoggerPtr                    logger;
@@ -52,6 +58,7 @@ class GtkQuestionWindow : public Gtk::Window
     pthread_mutex_t                       mutex;
 
     void                                  unhide(void);
+    void                                  make_about_dialog(void);
 
     static signalNewRuleValidated         new_rule_validated;
 };
