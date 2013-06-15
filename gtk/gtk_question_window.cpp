@@ -16,6 +16,7 @@ GtkQuestionWindow::GtkQuestionWindow(const Glib::RefPtr<Gtk::Application> &appli
   this->set_resizable(false);
   this->set_size_request(600, 200);
   this->set_position(Gtk::WIN_POS_CENTER);
+  this->set_icon_from_file("data/douane_128.png");
 
   // Create and define Gtk::Notebook options
   this->m_Notebook->set_border_width(3);

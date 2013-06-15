@@ -28,8 +28,10 @@ OBJ=freedesktop/desktop_file.o \
 
 INSTALL=/usr/bin/install -c
 BINDIR=/opt/douane
+DATADIR=$(BINDIR)/data
 PIDSDIR=/opt/douane/pids
 EXEC=douaned
+EXECICON=data/douane_128.png
 
 all: $(EXEC)
 
@@ -47,6 +49,8 @@ dbus:
 
 install: $(EXEC)
 	test -d $(BINDIR) || mkdir $(BINDIR)
+	test -d $(DATADIR) || mkdir $(DATADIR)
 	install -m 0500 $(EXEC) $(BINDIR)
+	install -m 0500 $(EXECICON) $(DATADIR)
 	install -m 0755 init.d/douane /etc/init.d/
 	install -m 0644 system.d/douane.conf /etc/dbus-1/system.d/
