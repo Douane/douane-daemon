@@ -50,7 +50,6 @@ class RulesManager
     std::map<std::string, Rule>             pending_rules;
 
     void                                    make_rule(const std::string executable_sha256, const std::string path, const bool allow);
-    boost::filesystem::path                 root_path(void) const;
 
     static signalNewRuleCreated             new_rule_created;
     static signalRuleDeleted                rule_deleted;

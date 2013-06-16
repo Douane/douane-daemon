@@ -16,7 +16,9 @@ GtkQuestionWindow::GtkQuestionWindow(const Glib::RefPtr<Gtk::Application> &appli
   this->set_resizable(false);
   this->set_size_request(600, 200);
   this->set_position(Gtk::WIN_POS_CENTER);
-  this->set_icon_from_file("data/douane_128.png");
+  Tools tools;
+  LOG4CXX_DEBUG(logger, tools.douane_data_path() + "douane_128.png");
+  this->set_icon_from_file(tools.douane_data_path() + "douane_128.png");
 
   // Create and define Gtk::Notebook options
   this->m_Notebook->set_border_width(3);
@@ -172,12 +174,13 @@ void GtkQuestionWindow::on_about_dialog_response(int response_id)
 void GtkQuestionWindow::make_about_dialog(void)
 {
   this->m_Dialog.set_transient_for(*this);
-  Glib::RefPtr<Gdk::Pixbuf> image = Gdk::Pixbuf::create_from_file("data/douane_128.png");
+  Tools tools;
+  Glib::RefPtr<Gdk::Pixbuf> image = Gdk::Pixbuf::create_from_file(tools.douane_data_path() + "douane_128.png");
   this->m_Dialog.set_logo(image);
   this->m_Dialog.set_program_name("Douane");
   this->m_Dialog.set_version("1.0.0");
   this->m_Dialog.set_copyright("Guillaume Hain");
-  this->m_Dialog.set_comments("Firewall at application layer.");
+  this->m_Dialog.set_comments("Daemon of Douane firewall at application layer.");
   this->m_Dialog.set_license("Proprietary");
   this->m_Dialog.set_website("https://twitter.com/douaneapp");
   this->m_Dialog.set_website_label("Douane on Twitter");

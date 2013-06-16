@@ -121,12 +121,12 @@ void do_from_options(std::string option, const char * optarg)
   }
 }
 
-/**
- *  In order to accept arguments when initializing application with Gtk::Application::create
- *  the flag Gio::APPLICATION_HANDLES_COMMAND_LINE has been passed and so we have to implement
- *  that callback method that will just activate the application and don't do anything as arguments
- *  are supported by getopt.h
- */
+/*
+**  In order to accept arguments when initializing application with Gtk::Application::create
+*  the flag Gio::APPLICATION_HANDLES_COMMAND_LINE has been passed and so we have to implement
+*  that callback method that will just activate the application and don't do anything as arguments
+*  are supported by getopt.h
+*/
 int on_cmd(const Glib::RefPtr<Gio::ApplicationCommandLine> &, Glib::RefPtr<Gtk::Application> &application)
 {
   application->activate();
@@ -141,9 +141,9 @@ int main(int argc, char * argv[])
   // Force the nice value to -20 (urgent)
   nice(-20);
 
-  /**
-   *  Application options handling with long options support.
-   */
+  /*
+  **  Application options handling with long options support.
+  */
   int c;
   const struct option long_options[] =
   {
@@ -190,11 +190,11 @@ int main(int argc, char * argv[])
     }
   }
 
-  /**
-   *  log4cxx configuration
-   *
-   *  Appending logs to the file /var/log/douane.log
-   */
+  /*
+  **  log4cxx configuration
+  *
+  *  Appending logs to the file /var/log/douane.log
+  */
   log4cxx::PatternLayoutPtr pattern = new log4cxx::PatternLayout(
     enabled_debug ? "%d{dd/MM/yyyy HH:mm:ss} | %5p | [%F::%c:%L]: %m%n" : "%d{dd/MM/yyyy HH:mm:ss} %5p: %m%n"
   );
@@ -202,13 +202,13 @@ int main(int argc, char * argv[])
     log4cxx::LayoutPtr(pattern),
     log_file_path
   );
-  log4cxx::helpers::Pool p;
-  fileAppender->activateOptions(p);
+  log4cxx::helpers::Pool pool;
+  fileAppender->activateOptions(pool);
   log4cxx::BasicConfigurator::configure(log4cxx::AppenderPtr(fileAppender));
   log4cxx::Logger::getRootLogger()->setLevel(enabled_debug ? log4cxx::Level::getDebug() : log4cxx::Level::getInfo());
-  /**
-   */
-
+  /*
+  **
+  */
 
   try {
     // Daemonize the application if --daemon argument is passed
@@ -243,17 +243,17 @@ int main(int argc, char * argv[])
     LOG4CXX_DEBUG(logger, "Initializing GTK window");
     GtkQuestionWindow         gtk_question_window(application);
 
-    /**
-     *  DesktopFiles is a manager for freedesktop.org files
-     *  (http://standards.freedesktop.org/autostart-spec/autostart-spec-latest.html#id2695912)
-     */
+    /*
+    **  DesktopFiles is a manager for freedesktop.org files
+    *  (http://standards.freedesktop.org/autostart-spec/autostart-spec-latest.html#id2695912)
+    */
     LOG4CXX_DEBUG(logger, "Initializing DesktopFiles");
     DesktopFiles          desktop_files;
 
-    /**
-     *  RulesManager is a "rules engine" that is responsible to store, ask and synchronize rules
-     *  with the kernel module
-     */
+    /*
+    **  RulesManager is a "rules engine" that is responsible to store, ask and synchronize rules
+    *  with the kernel module
+    */
     LOG4CXX_DEBUG(logger, "Initializing RulesManager");
     RulesManager          rules_manager;
     LOG4CXX_DEBUG(logger, "rules_manager: " << &rules_manager);
@@ -292,9 +292,9 @@ int main(int argc, char * argv[])
     // When RulesManager emit rule_deleted signal then fire NetlinkListener::delete_rule
     rules_manager.on_rule_deleted_connect(boost::bind(&NetlinkListener::delete_rule, &netlink_listener, _1));
 
-    /**
-     * D-Bus server initialization to publish data to external applications
-     */
+    /*
+    ** D-Bus server initialization to publish data to external applications
+    */
     DBusServer            dbus_server;
     dbus_server.set_rules_manager(&rules_manager);
 

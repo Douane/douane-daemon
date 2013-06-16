@@ -91,7 +91,8 @@ int RulesManager::save_rules(void) const
     root.put_child(it->first, it->second.to_json());
   }
 
-  boost::filesystem::path root_path = this->root_path();
+  Tools tools;
+  boost::filesystem::path root_path = tools.douane_root_path();
   root_path /= "rules";
   std::ofstream rules_file;
   rules_file.open(root_path.string().c_str());
@@ -114,7 +115,8 @@ int RulesManager::load_rules_from_file(void)
 {
   LOG4CXX_DEBUG(logger, "RulesManager::load_rules_from_file...");
 
-  boost::filesystem::path root_path = this->root_path();
+  Tools tools;
+  boost::filesystem::path root_path = tools.douane_root_path();
   root_path /= "rules";
   std::ifstream rules_file;
   rules_file.open(root_path.string().c_str());
@@ -144,16 +146,6 @@ int RulesManager::load_rules_from_file(void)
   LOG4CXX_INFO(logger, "Loaded " << this->valid_rules.size() << " rules");
 
   return 0;
-}
-
-boost::filesystem::path RulesManager::root_path(void) const
-{
-  boost::filesystem::path root_path("/opt/douane");
-
-  // Ensure folder exists
-  mkdir(root_path.string().c_str(), 0700);
-
-  return root_path;
 }
 
 void RulesManager::push_rules(void) const
