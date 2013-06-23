@@ -1,6 +1,8 @@
+DAEMON_VERSION=$(shell cat VERSION)
+
 CC=g++
 PKGCONFIG=`pkg-config --cflags --libs liblog4cxx dbus-c++-1 gtkmm-3.0`
-CFLAGS=-pedantic -Wall -W -g $(PKGCONFIG)
+CFLAGS=-pedantic -Wall -W -g $(PKGCONFIG) -DDOUANE_VERSION=\"$(DAEMON_VERSION)\"
 LDFLAGS=$(PKGCONFIG) -lboost_signals -lboost_system -lboost_filesystem -lboost_regex -lcrypto
 
 OBJ=freedesktop/desktop_file.o \

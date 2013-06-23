@@ -21,6 +21,10 @@
 #include <log4cxx/patternlayout.h>
 log4cxx::LoggerPtr logger = log4cxx::Logger::getLogger("Main");
 
+#ifndef DOUANE_VERSION
+#define DOUANE_VERSION "UNKNOWN"
+#endif
+
 bool          enabled_debug = false;
 bool          has_to_daemonize = false;
 bool          has_to_write_pid_file = false;
@@ -69,7 +73,7 @@ void do_daemonize(void)
 
 void do_version(void)
 {
-  std::cout << "TODO: Write version message" << std::endl;
+  std::cout << DOUANE_VERSION << std::endl;
   exit(1);
 }
 
