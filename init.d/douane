@@ -20,7 +20,15 @@ STARTPIDFILE=$DOUANEDIR/logs/startpid
 
 case "$1" in
     start)
+        # Load the kernel module if not already done
+        echo "runlevel: $(runlevel)" >> /var/log/douane.log
+        echo "lsmod | grep douane: $(lsmod | grep douane)" >> /var/log/douane.log
+        if [ -z "$(lsmod | grep douane)" ]; then
+            echo "FORCED LOADING OF LKM" >> /var/log/douane.log
+            modprobe douane
+        fi
         log_daemon_msg "Starting the $NAME daemon"
+        # Creating the pids folder is not existing
         if [ ! -e $PIDDIR ]; then
             mkdir $PIDDIR
             chown root $PIDDIR
@@ -46,7 +54,22 @@ case "$1" in
         stop
         start
         ;;
+    installautostart)
+        if [ -z "$(grep "modprobe douane" /etc/rc.local)" ]; then
+            sed 's/^exit 0/modprobe douane\n&/' /etc/rc.local | tee /tmp/rc.local;
+            cp /tmp/rc.local /etc;
+            rm /tmp/rc.local;
+        fi
+        ;;
+    uninstallautostart)
+        if [ -n "$(grep "modprobe douane" /etc/rc.local)" ]; then
+            sed '/^modprobe douane/d' /etc/rc.local | tee /tmp/rc.local;
+            cp /tmp/rc.local /etc;
+            rm /tmp/rc.local;
+        fi
+        ;;
     *)
+        echo "Unknown argument -- $1"
         echo "Usage:  {start|stop|status|restart}"
         exit 1
         ;;
