@@ -181,7 +181,7 @@ void GtkQuestionWindow::make_about_dialog(void)
   this->m_Dialog.set_version(DOUANE_VERSION);
   this->m_Dialog.set_copyright("Guillaume Hain");
   this->m_Dialog.set_comments("Daemon of Douane firewall at application layer.");
-  this->m_Dialog.set_license("Proprietary");
+  this->m_Dialog.set_license("All rights reserved to the developer. You're only allowed to use it.");
   this->m_Dialog.set_website("https://twitter.com/douaneapp");
   this->m_Dialog.set_website_label("Douane on Twitter");
   std::vector<Glib::ustring> list_authors;
