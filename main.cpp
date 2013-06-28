@@ -219,7 +219,7 @@ int main(int argc, char * argv[])
     if (has_to_daemonize)
     {
       do_daemonize();
-      LOG4CXX_INFO(logger, "A deamon process has been created");
+      LOG4CXX_INFO(logger, "A daemon process has been created");
     }
 
     if (has_to_write_pid_file)
