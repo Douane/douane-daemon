@@ -17,12 +17,21 @@ DAEMON=$DOUANEDIR/$NAME
 PIDDIR=$DOUANEDIR/pids
 PIDFILE=$PIDDIR/$NAME.pid
 STARTPIDFILE=$DOUANEDIR/logs/startpid
+CURRENT_KERNEL_VERSION=`uname -r`
+CURRENT_KERNEL_VERSION_SHORT=`uname -r | cut -d "-" -f1`
 
 case "$1" in
     start)
-        # Load the kernel module if not already done
+        # Install and Load the kernel module if not already done
         if [ -z "$(lsmod | grep douane)" ]; then
-            echo "FORCED LOADING OF LKM" >> /var/log/douane.log
+            # After a kernel upgrade we link the kernel module to the new kernel
+            if [ ! -f "/lib/modules/$CURRENT_KERNEL_VERSION/updates/dkms/douane.ko" ]; then
+                echo "Installing missing kernel module for kernel version $CURRENT_KERNEL_VERSION" >> /var/log/douane.log
+                ln -s "/lib/modules/$CURRENT_KERNEL_VERSION_SHORT/updates/dkms/douane.ko" "/lib/modules/$CURRENT_KERNEL_VERSION/updates/dkms/douane.ko"
+                # Now update the kernel modules list
+                depmod -a
+            fi
+            # Now load the kernel module
             modprobe douane
         fi
         log_daemon_msg "Starting the $NAME daemon"
