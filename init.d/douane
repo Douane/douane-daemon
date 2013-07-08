@@ -29,10 +29,15 @@ case "$1" in
                 mkdir -p "/lib/modules/$CURRENT_KERNEL_VERSION/updates/dkms/"
             fi
             if [ ! -f "/lib/modules/$CURRENT_KERNEL_VERSION/updates/dkms/douane.ko" ]; then
-                echo "Installing missing kernel module for kernel version $CURRENT_KERNEL_VERSION" >> /var/log/douane.log
-                ln -s "/lib/modules/$CURRENT_KERNEL_VERSION_SHORT/updates/dkms/douane.ko" "/lib/modules/$CURRENT_KERNEL_VERSION/updates/dkms/douane.ko"
-                # Now update the kernel modules list
-                depmod -a
+                if [ ! -f "/lib/modules/$CURRENT_KERNEL_VERSION_SHORT/updates/dkms/douane.ko" ]; then
+                    echo "No module file found at /lib/modules/$CURRENT_KERNEL_VERSION_SHORT/updates/dkms/" >> /var/log/douane.log
+                    exit 2
+                else
+                    echo "Installing missing kernel module for kernel version $CURRENT_KERNEL_VERSION" >> /var/log/douane.log
+                    ln -s "/lib/modules/$CURRENT_KERNEL_VERSION_SHORT/updates/dkms/douane.ko" "/lib/modules/$CURRENT_KERNEL_VERSION/updates/dkms/douane.ko"
+                    # Now update the kernel modules list
+                    depmod -a
+                fi
             fi
             # Now load the kernel module
             modprobe douane
