@@ -19,25 +19,41 @@ PIDFILE=$PIDDIR/$NAME.pid
 STARTPIDFILE=$DOUANEDIR/logs/startpid
 CURRENT_KERNEL_VERSION=`uname -r`
 CURRENT_KERNEL_VERSION_SHORT=`uname -r | cut -d "-" -f1`
+KERNEL_MODULES_PATH="/opt/douane/lkms"
+CURRENT_KERNEL_VERSION_PATH="/lib/modules/$CURRENT_KERNEL_VERSION/updates/dkms"
+
+verlte() {
+    [ "$1" = "$2" ] && return 1 || [  "$2" = "`echo -e "$1\n$2" | sort -V | head -n1`" ]
+}
+
+verlt() {
+    [ "$1" = "$2" ] && return 1 || verlte $2 $1
+}
+
+link_kernel_module_to_current_kernel()
+{
+    verlt $CURRENT_KERNEL_VERSION_SHORT 3.7.0 && DOUANE_KERNEL_MODULE_VERSION="3.6"
+    [[ "$CURRENT_KERNEL_VERSION_SHORT" == 3.7.* ]] && DOUANE_KERNEL_MODULE_VERSION="3.7"
+    [[ "$CURRENT_KERNEL_VERSION_SHORT" == 3.8.* ]] && DOUANE_KERNEL_MODULE_VERSION="3.8"
+    verlte $CURRENT_KERNEL_VERSION_SHORT 3.9.0 && DOUANE_KERNEL_MODULE_VERSION="3.9"
+
+    echo "Linking douane kernel module version $DOUANE_KERNEL_MODULE_VERSION." >> /var/log/douane.log
+    ln -s "$KERNEL_MODULES_PATH/douane_$DOUANE_KERNEL_MODULE_VERSION.ko" "$CURRENT_KERNEL_VERSION_PATH/douane.ko"
+}
 
 case "$1" in
     start)
         # Install and Load the kernel module if not already done
         if [ -z "$(lsmod | grep douane)" ]; then
             # After a kernel upgrade we link the kernel module to the new kernel
-            if [ ! -d "/lib/modules/$CURRENT_KERNEL_VERSION/updates/dkms/" ]; then
-                mkdir -p "/lib/modules/$CURRENT_KERNEL_VERSION/updates/dkms/"
-            fi
-            if [ ! -f "/lib/modules/$CURRENT_KERNEL_VERSION/updates/dkms/douane.ko" ]; then
-                if [ ! -f "/lib/modules/$CURRENT_KERNEL_VERSION_SHORT/updates/dkms/douane.ko" ]; then
-                    echo "No module file found at /lib/modules/$CURRENT_KERNEL_VERSION_SHORT/updates/dkms/" >> /var/log/douane.log
-                    exit 2
-                else
-                    echo "Installing missing kernel module for kernel version $CURRENT_KERNEL_VERSION" >> /var/log/douane.log
-                    ln -s "/lib/modules/$CURRENT_KERNEL_VERSION_SHORT/updates/dkms/douane.ko" "/lib/modules/$CURRENT_KERNEL_VERSION/updates/dkms/douane.ko"
-                    # Now update the kernel modules list
-                    depmod -a
-                fi
+            [[ ! -d "$CURRENT_KERNEL_VERSION_PATH" ]] && mkdir -p "$CURRENT_KERNEL_VERSION_PATH"
+            # In the case of missing douane kernel module link in the current kernel
+            if [ ! -f "$CURRENT_KERNEL_VERSION_PATH/douane.ko" ]; then
+                # Link the right kernel module to the current kernel
+                link_kernel_module_to_current_kernel
+
+                # Now update the kernel modules list
+                depmod -a
             fi
             # Now load the kernel module
             modprobe douane
