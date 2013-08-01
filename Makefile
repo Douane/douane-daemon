@@ -9,6 +9,7 @@ OBJ=freedesktop/desktop_file.o \
 	freedesktop/desktop_files.o \
 	gtk/gtk_application_icon_sublimer.o \
 	gtk/gtk_box_unknown_application.o \
+	gtk/gtk_process_icon.o \
 	gtk/gtk_question_window.o \
 	dbus_server.o \
 	dns_cache.o \

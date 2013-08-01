@@ -18,15 +18,15 @@ NetworkActivity::NetworkActivity(struct network_activity * activity, ProcessesMa
 NetworkActivity::NetworkActivity(const NetworkActivity &activity)
 : logger(log4cxx::Logger::getLogger("NetworkActivity"))
 {
-  this->devise_name   = activity.devise_name;
-  this->protocol      = activity.protocol;
-  this->ip_source     = activity.ip_source;
-  this->port_source   = activity.port_source;
-  this->ip_destination  = activity.ip_destination;
+  this->devise_name       = activity.devise_name;
+  this->protocol          = activity.protocol;
+  this->ip_source         = activity.ip_source;
+  this->port_source       = activity.port_source;
+  this->ip_destination    = activity.ip_destination;
   this->port_destination  = activity.port_destination;
-  this->size        = activity.size;
-  this->hostname      = activity.hostname;
-  this->process     = activity.process;
+  this->size              = activity.size;
+  this->hostname          = activity.hostname;
+  this->process           = activity.process;
 }
 
 NetworkActivity::~NetworkActivity(void)

@@ -63,8 +63,11 @@ Process * ProcessesManager::make_new_process(Process * new_process)
   if (new_process->icon_name == "")
     new_process->icon_name = "image-missing";
 
+  // Set the process icon from icon_name or executable_name
+  new_process->get_application_icon();
+
   // Save that new process
-  this->processes.insert(std::make_pair(new_process->path, *new_process));
+  this->processes.insert(std::pair<const std::string&, const Process&>(new_process->path, *new_process));
 
   return &this->processes.find(new_process->path)->second;
 }

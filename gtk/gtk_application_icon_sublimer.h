@@ -17,7 +17,7 @@ class GtkApplicationIconSublimer : public Gtk::Image
     /*
     ** Instance methods
     */
-    void                      set_from_icon_name(Glib::ustring const &name);
+    void                      set(const Glib::RefPtr<Gdk::Pixbuf>& icon);
 
   protected:
     virtual bool              on_draw(const Cairo::RefPtr<Cairo::Context>& cr);

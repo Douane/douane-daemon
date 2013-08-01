@@ -14,7 +14,10 @@ GtkApplicationIconSublimer::~GtkApplicationIconSublimer(void)
 bool GtkApplicationIconSublimer::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 {
   if (!this->application_icon)
+  {
+    LOG4CXX_DEBUG(logger, "Got no icon..");
     return false;
+  }
 
   Gtk::Allocation allocation = get_allocation();
   const int height = allocation.get_height();
@@ -25,12 +28,12 @@ bool GtkApplicationIconSublimer::on_draw(const Cairo::RefPtr<Cairo::Context>& cr
   return true;
 }
 
-void GtkApplicationIconSublimer::set_from_icon_name(Glib::ustring const &icon_name)
+void GtkApplicationIconSublimer::set(const Glib::RefPtr<Gdk::Pixbuf>& icon)
 {
-  Glib::RefPtr<Gtk::IconTheme> theme = Gtk::IconTheme::get_default();
-
-  if (theme->has_icon(icon_name))
+  if (!icon)
   {
-    this->application_icon = theme->load_icon(icon_name, 400, Gtk::ICON_LOOKUP_USE_BUILTIN);
+    LOG4CXX_DEBUG(logger, "GtkApplicationIconSublimer::set Got no icon..");
   }
+
+  this->application_icon = icon;
 }

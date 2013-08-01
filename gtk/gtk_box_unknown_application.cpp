@@ -114,13 +114,11 @@ void GtkBoxUnknownApplication::build_box(void)
   buttonbox_allow_deny->pack_start(*button_deny, false, true, 0);
   vbox_application_info_and_buttons->pack_start(*buttonbox_allow_deny, true, true, 0);
 
-  Glib::ustring icon_name(this->activity.process->icon_name);
-
   /**
    *  The huge Gtk::Image of the icon with an alpha
    */
   GtkApplicationIconSublimer * application_icon_sublimer = Gtk::manage(new GtkApplicationIconSublimer());
-  application_icon_sublimer->set_from_icon_name(icon_name);
+  application_icon_sublimer->set(this->activity.process->icon.get_large_icon_pixbuf());
 
   fixed_background->put(*application_icon_sublimer, 350, 0);
   fixed_background->put(*vbox_application_info_and_buttons, 0, 0);
@@ -129,7 +127,7 @@ void GtkBoxUnknownApplication::build_box(void)
 
   // Load application icon to put it in place of the tab label
   Gtk::Image * icon = Gtk::manage(new Gtk::Image());
-  icon->set_from_icon_name(icon_name, Gtk::IconSize(Gtk::ICON_SIZE_DND));
+  icon->set(this->activity.process->icon.get_small_icon_pixbuf());
 
   // Create a new tab with the icon
   this->notebook->append_page(*this, *icon);
