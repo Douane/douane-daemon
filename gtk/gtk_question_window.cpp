@@ -162,6 +162,16 @@ void GtkQuestionWindow::add_activity(const NetworkActivity * activity)
   }
 }
 
+void GtkQuestionWindow::forget_unknown_application(const Rule * rule)
+{
+  std::map<std::string, const Process*>::iterator it = this->unknown_applications.find(rule->executable_sha256);
+  if (it != this->unknown_applications.end())
+  {
+    // Remove the unknown application from its SHA256
+    this->unknown_applications.erase(it);
+  }
+}
+
 void GtkQuestionWindow::on_about_dialog_response(int response_id)
 {
   if((response_id == Gtk::RESPONSE_CLOSE) ||

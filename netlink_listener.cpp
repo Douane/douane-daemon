@@ -66,7 +66,7 @@ void NetlinkListener::execute(void)
          *  error EAGAIN (-11) as the socket will be locked when trying to send another
          *  network activity.
          */
-        NetworkActivity *     network_activity = new NetworkActivity(activity_struct, this->processes_manager);
+        NetworkActivity *       network_activity = new NetworkActivity(activity_struct, this->processes_manager);
         NetlinkMessageHandler * netlink_message_handler = new NetlinkMessageHandler(network_activity);
         netlink_message_handler->start_and_detach();
       }
@@ -100,16 +100,20 @@ void NetlinkListener::send_rule(const Rule * rule)
   // Build a new message
   struct network_activity * activity = this->build_message(KIND_SENDING_RULE);
 
-  if (rule->allow)
+  if (rule->is_allowed())
   {
-    // Assign some values
-    strcpy(activity->devise_name, "lo");
-    std::copy(rule->process_path.begin(), rule->process_path.end(), activity->process_path);
-    activity->allowed = rule->is_allowed() ? 1 : 0;
-
-    // Send it to the Kernel module
-    this->send_message(activity);
+    LOG4CXX_DEBUG(logger, "NetlinkListener::send_rule ALLOW for " << activity->process_path);
+  } else {
+    LOG4CXX_DEBUG(logger, "NetlinkListener::send_rule DISALLOW for " << activity->process_path);
   }
+
+  // Assign some values
+  strcpy(activity->devise_name, "lo");
+  std::copy(rule->process_path.begin(), rule->process_path.end(), activity->process_path);
+  activity->allowed = rule->is_allowed() ? 1 : 0;
+
+  // Send it to the Kernel module
+  this->send_message(activity);
 }
 
 void NetlinkListener::delete_rule(const Rule * rule)
@@ -117,15 +121,12 @@ void NetlinkListener::delete_rule(const Rule * rule)
   // Build a new message
   struct network_activity * activity = this->build_message(KIND_DELETE_RULE);
 
-  if (rule->allow)
-  {
-    // Assign some values
-    strcpy(activity->devise_name, "lo");
-    std::copy(rule->process_path.begin(), rule->process_path.end(), activity->process_path);
+  // Assign some values
+  strcpy(activity->devise_name, "lo");
+  std::copy(rule->process_path.begin(), rule->process_path.end(), activity->process_path);
 
-    // Send it to the Kernel module
-    this->send_message(activity);
-  }
+  // Send it to the Kernel module
+  this->send_message(activity);
 }
 
 void NetlinkListener::say_goodbye(void)

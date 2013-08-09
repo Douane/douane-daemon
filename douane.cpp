@@ -38,5 +38,6 @@ std::vector< ::DBus::Struct< std::string, std::string, bool > > Douane::GetRules
 
 bool Douane::DeleteRule(const std::string& rule_id)
 {
+  LOG4CXX_DEBUG(logger, "Douane::DeleteRule(" << rule_id << ")");
   return this->rules_manager->delete_rule_for_sha256(rule_id);
 }

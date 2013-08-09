@@ -35,6 +35,7 @@ class GtkQuestionWindow : public Gtk::Window
     bool                                  hide_question_window(void);
     bool                                  show_question_window(void);
     void                                  add_activity(const NetworkActivity * activity);
+    void                                  forget_unknown_application(const Rule * rule);
     void                                  on_about_dialog_response(int response_id);
     // Signals methods
     static boost::signals2::connection    on_new_rule_validated_connect(const signalNewRuleValidatedType &slot);
