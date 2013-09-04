@@ -25,35 +25,35 @@ public:
         register_method(Douane_adaptor, DeleteRule, _DeleteRule_stub);
     }
 
-    ::DBus::IntrospectedInterface *introspect() const 
+    ::DBus::IntrospectedInterface *introspect() const
     {
-        static ::DBus::IntrospectedArgument GetRules_args[] = 
+        static ::DBus::IntrospectedArgument GetRules_args[] =
         {
             { "rules", "a(ssb)", false },
             { 0, 0, 0 }
         };
-        static ::DBus::IntrospectedArgument DeleteRule_args[] = 
+        static ::DBus::IntrospectedArgument DeleteRule_args[] =
         {
             { "rule_id", "s", true },
             { "result", "b", false },
             { 0, 0, 0 }
         };
-        static ::DBus::IntrospectedMethod Douane_adaptor_methods[] = 
+        static ::DBus::IntrospectedMethod Douane_adaptor_methods[] =
         {
             { "GetRules", GetRules_args },
             { "DeleteRule", DeleteRule_args },
             { 0, 0 }
         };
-        static ::DBus::IntrospectedMethod Douane_adaptor_signals[] = 
+        static ::DBus::IntrospectedMethod Douane_adaptor_signals[] =
         {
             { 0, 0 }
         };
-        static ::DBus::IntrospectedProperty Douane_adaptor_properties[] = 
+        static ::DBus::IntrospectedProperty Douane_adaptor_properties[] =
         {
             { "DaemonVersion", "s", true, false },
             { 0, 0, 0, 0 }
         };
-        static ::DBus::IntrospectedInterface Douane_adaptor_interface = 
+        static ::DBus::IntrospectedInterface Douane_adaptor_interface =
         {
             "org.zedroot.Douane",
             Douane_adaptor_methods,
@@ -110,5 +110,5 @@ private:
     }
 };
 
-} } 
+} }
 #endif //__dbusxx__org_zedroot_douane_h__ADAPTOR_MARSHAL_H

@@ -12,8 +12,6 @@ OBJ=freedesktop/desktop_file.o \
 	gtk/gtk_process_icon.o \
 	gtk/gtk_question_window.o \
 	dbus_server.o \
-	dns_cache.o \
-	dns_client.o \
 	douane.o \
 	ip_address_translator.o \
 	main.o \

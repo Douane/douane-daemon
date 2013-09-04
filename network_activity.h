@@ -36,7 +36,7 @@ class NetworkActivity
     bool                                incoming(void) const;
     bool                                outcoming(void) const;
     const std::string                   append_port_code(void) const;
-    void                                request_resolve_remote_hostname(void);
+    // void                                request_resolve_remote_hostname(void);
     void                                update_hostname(const std::string requested_address, const std::string resolved_hostname);
     const std::string                   hostname_or_ip_destination(void) const;
     static boost::signals2::connection  on_hostname_updated_connect(const signalHostnameUpdatedType &slot);

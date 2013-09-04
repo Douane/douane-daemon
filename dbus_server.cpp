@@ -37,7 +37,7 @@ void DBusServer::execute()
   this->dispatcher.enter();
 }
 
-void DBusServer::new_network_activity(NetworkActivity * activity) const
+void DBusServer::new_network_activity(NetworkActivity *) const
 {
   // TODO: Implement a signal in the D-Bus server to publish network activities.
 }

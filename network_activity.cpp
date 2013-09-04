@@ -89,14 +89,14 @@ const std::string NetworkActivity::append_port_code(void) const
   }
 }
 
-void NetworkActivity::request_resolve_remote_hostname(void)
-{
-  this->dns_client = new DnsClient(this->ip_destination);
+// void NetworkActivity::request_resolve_remote_hostname(void)
+// {
+//   this->dns_client = new DnsClient(this->ip_destination);
 
-  // When DnsClient emit result_received signal then fire NetworkActivity::update_hostname
-  this->update_signal = this->dns_client->on_result_received_connect(boost::bind(&NetworkActivity::update_hostname, this, _1, _2));
-  this->dns_client->find_or_resolve_by_ip_address();
-}
+//   // When DnsClient emit result_received signal then fire NetworkActivity::update_hostname
+//   this->update_signal = this->dns_client->on_result_received_connect(boost::bind(&NetworkActivity::update_hostname, this, _1, _2));
+//   this->dns_client->find_or_resolve_by_ip_address();
+// }
 
 void NetworkActivity::update_hostname(const std::string requested_address, const std::string resolved_hostname)
 {

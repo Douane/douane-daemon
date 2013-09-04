@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # douane      This shell script takes care of starting and stopping
-#             douane daemon (A modern applicatif firewall)
+#             douane daemon (A modern firewall at application layer)
 #
 # Author: Guillaume Hain zedtux@zedroot.org
 #
@@ -16,50 +16,9 @@ DOUANEDIR=/opt/douane
 DAEMON=$DOUANEDIR/$NAME
 PIDDIR=$DOUANEDIR/pids
 PIDFILE=$PIDDIR/$NAME.pid
-STARTPIDFILE=$DOUANEDIR/logs/startpid
-CURRENT_KERNEL_VERSION=`uname -r`
-CURRENT_KERNEL_VERSION_SHORT=`uname -r | cut -d "-" -f1`
-KERNEL_MODULES_PATH="/opt/douane/lkms"
-CURRENT_KERNEL_VERSION_PATH="/lib/modules/$CURRENT_KERNEL_VERSION/updates/dkms"
-
-verlte() {
-    [ "$1" = "$2" ] && return 1 || [  "$2" = "`echo -e "$1\n$2" | sort -V | head -n1`" ]
-}
-
-verlt() {
-    [ "$1" = "$2" ] && return 1 || verlte $2 $1
-}
-
-link_kernel_module_to_current_kernel()
-{
-    verlt $CURRENT_KERNEL_VERSION_SHORT 3.6.0 && DOUANE_KERNEL_MODULE_VERSION="3.5.0"
-    [[ "$CURRENT_KERNEL_VERSION_SHORT" == 3.6.* ]] && DOUANE_KERNEL_MODULE_VERSION="3.6.0"
-    [[ "$CURRENT_KERNEL_VERSION_SHORT" == 3.7.* ]] && DOUANE_KERNEL_MODULE_VERSION="3.7.0"
-    [[ "$CURRENT_KERNEL_VERSION_SHORT" == 3.8.* ]] && DOUANE_KERNEL_MODULE_VERSION="3.8.0"
-    [[ "$CURRENT_KERNEL_VERSION_SHORT" == 3.9.* ]] && DOUANE_KERNEL_MODULE_VERSION="3.9.0"
-    verlte $CURRENT_KERNEL_VERSION_SHORT 3.9.999 && DOUANE_KERNEL_MODULE_VERSION="3.10.0"
-
-    echo "Linking douane kernel module version $DOUANE_KERNEL_MODULE_VERSION." >> /var/log/douane.log
-    ln -s "$KERNEL_MODULES_PATH/douane_$DOUANE_KERNEL_MODULE_VERSION.ko" "$CURRENT_KERNEL_VERSION_PATH/douane.ko"
-}
 
 case "$1" in
     start)
-        # Install and Load the kernel module if not already done
-        if [ -z "$(lsmod | grep douane)" ]; then
-            # After a kernel upgrade we link the kernel module to the new kernel
-            [[ ! -d "$CURRENT_KERNEL_VERSION_PATH" ]] && mkdir -p "$CURRENT_KERNEL_VERSION_PATH"
-            # In the case of missing douane kernel module link in the current kernel
-            if [ ! -f "$CURRENT_KERNEL_VERSION_PATH/douane.ko" ]; then
-                # Link the right kernel module to the current kernel
-                link_kernel_module_to_current_kernel
-
-                # Now update the kernel modules list
-                depmod -a
-            fi
-            # Now load the kernel module
-            modprobe douane
-        fi
         log_daemon_msg "Starting the $NAME daemon"
         # Creating the pids folder is not existing
         if [ ! -e $PIDDIR ]; then
