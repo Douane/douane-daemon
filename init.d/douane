@@ -20,6 +20,8 @@ PIDFILE=$PIDDIR/$NAME.pid
 case "$1" in
     start)
         log_daemon_msg "Starting the $NAME daemon"
+        # Load kernel module if not already loaded
+        [[ -z "$(lsmod | grep douane)" ]] && modprobe douane
         # Creating the pids folder is not existing
         if [ ! -e $PIDDIR ]; then
             mkdir $PIDDIR
