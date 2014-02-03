@@ -51,6 +51,8 @@ dbus:
 install: $(EXEC)
 	test -d $(BINDIR) || mkdir -p $(BINDIR)
 	test -d $(DATADIR) || mkdir -p $(DATADIR)
+	test -d $(DESTDIR)/etc/init.d/ || mkdir -p $(DESTDIR)/etc/init.d/
+	test -d $(DESTDIR)/etc/dbus-1/system.d/ || mkdir -p $(DESTDIR)/etc/dbus-1/system.d/
 	install -m 0500 $(EXEC) $(BINDIR)
 	install -m 0500 $(EXECICON) $(DATADIR)
 	install -m 0755 init.d/douane $(DESTDIR)/etc/init.d/
