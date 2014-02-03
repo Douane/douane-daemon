@@ -59,5 +59,5 @@ install: $(EXEC)
 	install -m 0500 $(EXECICON) $(DATADIR)
 	install -m 0755 init.d/douane $(DESTDIR)/etc/init.d/
 	install -m 0644 system.d/douane.conf $(DESTDIR)/etc/dbus-1/system.d/
-	install -m 0500 opt/douane/data/douane_128.png $(DESTDIR)/opt/douane/data/
-	install -m 0500 douane.png $(DESTDIR)/usr/share/icons/hicolor/128x128/apps
+	install -m 0500 data/douane_128.png $(DESTDIR)/opt/douane/data/
+	install -m 0500 data/douane_128.png $(DESTDIR)/usr/share/icons/hicolor/128x128/apps
