@@ -28,9 +28,9 @@ OBJ=freedesktop/desktop_file.o \
 	tools.o
 
 INSTALL=/usr/bin/install -c
-BINDIR=/opt/douane
+BINDIR=$(DESTDIR)/opt/douane
 DATADIR=$(BINDIR)/data
-PIDSDIR=/opt/douane/pids
+PIDSDIR=$(DESTDIR)/opt/douane/pids
 EXEC=douaned
 EXECICON=data/douane_128.png
 
@@ -49,9 +49,9 @@ dbus:
 	dbusxx-xml2cpp d-bus/org.zedroot.douane.xml --adaptor=org_zedroot_douane.h
 
 install: $(EXEC)
-	test -d $(BINDIR) || mkdir $(BINDIR)
-	test -d $(DATADIR) || mkdir $(DATADIR)
+	test -d $(BINDIR) || mkdir -p $(BINDIR)
+	test -d $(DATADIR) || mkdir -p $(DATADIR)
 	install -m 0500 $(EXEC) $(BINDIR)
 	install -m 0500 $(EXECICON) $(DATADIR)
-	install -m 0755 init.d/douane /etc/init.d/
-	install -m 0644 system.d/douane.conf /etc/dbus-1/system.d/
+	install -m 0755 init.d/douane $(DESTDIR)/etc/init.d/
+	install -m 0644 system.d/douane.conf $(DESTDIR)/etc/dbus-1/system.d/
