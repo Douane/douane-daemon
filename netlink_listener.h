@@ -7,15 +7,13 @@
 #include "network_activity.h"
 #include "netlink_socket.h"
 #include "rules_manager.h"
-#include "thread.h"
 #include "netlink_message_handler.h"
 
 /*
 **  Receive network activities from the Kernel module.
 */
 class NetlinkListener
-: public NetlinkSocket,
-  public Thread
+: public NetlinkSocket
 {
   public:
     /*
@@ -35,14 +33,15 @@ class NetlinkListener
     */
     void                                  set_processes_manager(ProcessesManager * processes_manager);
     void                                  start(void);
-    void                                  execute(void);
     void                                  die(void);
-    // Signals methods
-    static boost::signals2::connection    on_connected_to_kernel_module_connect(const signalConnectedToKernelModuleType &slot);
-
     void                                  send_rule(const Rule * rule);
     void                                  delete_rule(const Rule * rule);
     void                                  say_goodbye(void);
+
+    /*
+    ** Signals methods
+    */
+    static boost::signals2::connection    on_connected_to_kernel_module_connect(const signalConnectedToKernelModuleType &slot);
 
   private:
     log4cxx::LoggerPtr                    logger;

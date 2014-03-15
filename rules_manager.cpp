@@ -47,14 +47,6 @@ void RulesManager::lookup_activity(const NetworkActivity * activity)
   }
 }
 
-void RulesManager::make_rule(const std::string executable_sha256, const std::string path, const bool allow)
-{
-  // Save the rule in memory
-  this->valid_rules.insert(std::make_pair(executable_sha256, Rule(executable_sha256, path, allow)));
-
-  // Broadcast the created rule
-  this->new_rule_created(&this->valid_rules.find(executable_sha256)->second);
-}
 
 void RulesManager::make_rule_from(const NetworkActivity * activity, bool allow)
 {
@@ -63,24 +55,6 @@ void RulesManager::make_rule_from(const NetworkActivity * activity, bool allow)
   // Write rules on disk
   this->save_rules();
 }
-
-boost::signals2::connection RulesManager::on_new_rule_created_connect(const signalNewRuleCreatedType &slot)
-{
-  return RulesManager::new_rule_created.connect(slot);
-}
-RulesManager::signalNewRuleCreated RulesManager::new_rule_created;
-
-boost::signals2::connection RulesManager::on_rule_deleted_connect(const signalRuleDeletedType &slot)
-{
-  return RulesManager::rule_deleted.connect(slot);
-}
-RulesManager::signalRuleDeleted RulesManager::rule_deleted;
-
-boost::signals2::connection RulesManager::on_new_unknown_activity_connect(const signalNewUnknownActivityType &slot)
-{
-  return RulesManager::new_unknown_activity.connect(slot);
-}
-RulesManager::signalNewUnknownActivity RulesManager::new_unknown_activity;
 
 int RulesManager::save_rules(void) const
 {
@@ -150,8 +124,12 @@ int RulesManager::load_rules_from_file(void)
 
 void RulesManager::push_rules(void) const
 {
+  LOG4CXX_DEBUG(logger, "RulesManager::push_rules...");
+  LOG4CXX_DEBUG(logger, this->valid_rules.size() << " rules to be pushed.");
+
   for(std::map<std::string, const Rule>::const_iterator it = this->valid_rules.begin(); it != this->valid_rules.end(); ++it)
   {
+    LOG4CXX_DEBUG(logger, "Pushing rule for " << &it->first);
     this->new_rule_created(&it->second);
   }
 }
@@ -191,4 +169,38 @@ bool RulesManager::delete_rule_for_sha256(const std::string &executable_sha256)
 
     return true;
   }
+}
+
+/*
+** Signals methods
+*/
+boost::signals2::connection RulesManager::on_new_rule_created_connect(const signalNewRuleCreatedType &slot)
+{
+  return RulesManager::new_rule_created.connect(slot);
+}
+RulesManager::signalNewRuleCreated RulesManager::new_rule_created;
+
+boost::signals2::connection RulesManager::on_rule_deleted_connect(const signalRuleDeletedType &slot)
+{
+  return RulesManager::rule_deleted.connect(slot);
+}
+RulesManager::signalRuleDeleted RulesManager::rule_deleted;
+
+boost::signals2::connection RulesManager::on_new_unknown_activity_connect(const signalNewUnknownActivityType &slot)
+{
+  return RulesManager::new_unknown_activity.connect(slot);
+}
+RulesManager::signalNewUnknownActivity RulesManager::new_unknown_activity;
+
+/*
+** Private
+*/
+
+void RulesManager::make_rule(const std::string executable_sha256, const std::string path, const bool allow)
+{
+  // Save the rule in memory
+  this->valid_rules.insert(std::make_pair(executable_sha256, Rule(executable_sha256, path, allow)));
+
+  // Broadcast the created rule
+  this->new_rule_created(&this->valid_rules.find(executable_sha256)->second);
 }

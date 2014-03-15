@@ -15,27 +15,11 @@ Process::Process(const Process &process)
   this->icon_name         = process.icon_name;
   this->printable_name    = process.printable_name;
   this->executable_sha256 = process.executable_sha256;
-  this->icon              = process.icon;
 }
 
 Process::~Process(void)
 {
 
-}
-
-void Process::build_from_path(void)
-{
-  this->get_executable_name_from_path();
-}
-
-void Process::get_executable_name_from_path(void)
-{
-  this->executable_name = boost::filesystem::path(this->path).filename().string();
-}
-
-void Process::get_application_icon(void)
-{
-  this->icon.set_icon_from_process(this->icon_name, this->executable_name);
 }
 
 const std::string Process::get_executable_sha256(void) const
@@ -47,4 +31,18 @@ void Process::update_executable_sha256(void)
 {
   Tools tools;
   this->executable_sha256 = tools.make_sha256_from(this->path);
+}
+
+/*
+** Private
+*/
+
+void Process::build_from_path(void)
+{
+  this->get_executable_name_from_path();
+}
+
+void Process::get_executable_name_from_path(void)
+{
+  this->executable_name = boost::filesystem::path(this->path).filename().string();
 }

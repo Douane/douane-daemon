@@ -11,20 +11,6 @@ Tools::~Tools(void)
 
 }
 
-const std::string Tools::executable_to_string(const std::string & path) const
-{
-  std::ifstream in(path.c_str(), std::ios::in | std::ios::binary);
-  if (in)
-  {
-    std::ostringstream contents;
-    contents << in.rdbuf();
-    in.close();
-    return(contents.str());
-  }
-  LOG4CXX_ERROR(logger, "On opening " << path << ": " << strerror(errno));
-  return std::string("");
-}
-
 const std::string Tools::make_sha256_from(const std::string & path) const
 {
   const std::string file_content = this->executable_to_string(path);
@@ -68,7 +54,20 @@ const std::string Tools::douane_root_path(void) const
   return std::string(root_path);
 }
 
-const std::string Tools::douane_data_path(void) const
+/*
+** Private
+*/
+
+const std::string Tools::executable_to_string(const std::string & path) const
 {
-  return this->douane_root_path() + "/data/";
+  std::ifstream in(path.c_str(), std::ios::in | std::ios::binary);
+  if (in)
+  {
+    std::ostringstream contents;
+    contents << in.rdbuf();
+    in.close();
+    return(contents.str());
+  }
+  LOG4CXX_ERROR(logger, "On opening " << path << ": " << strerror(errno));
+  return std::string("");
 }

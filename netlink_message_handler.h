@@ -29,7 +29,10 @@ class NetlinkMessageHandler : public Thread
     ** Instance methods
     */
     void                                execute(void);
-    // Signals methods
+
+    /*
+    ** Signals methods
+    */
     static boost::signals2::connection  on_new_network_activity_connect(const signalNewNetworkActivityType &slot);
 
   private:

@@ -22,6 +22,9 @@ void NetlinkMessageHandler::execute(void)
   delete this;
 }
 
+/*
+** Signals methods
+*/
 boost::signals2::connection NetlinkMessageHandler::on_new_network_activity_connect(const signalNewNetworkActivityType &slot)
 {
   return new_network_activity.connect(slot);

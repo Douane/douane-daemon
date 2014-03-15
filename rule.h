@@ -20,7 +20,6 @@ class Rule
     */
     bool                        is_allowed(void) const;
     boost::property_tree::ptree to_json(void) const;
-    pid_t                       find_and_update_process_pid(void) const;
 
     const std::string           executable_sha256;
     const std::string           process_path;

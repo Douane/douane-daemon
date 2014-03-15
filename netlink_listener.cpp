@@ -18,34 +18,37 @@ void NetlinkListener::set_processes_manager(ProcessesManager * processes_manager
 
 void NetlinkListener::start(void)
 {
+  struct msghdr             msg;
+  struct iovec              iov;
+  struct network_activity * activity_struct = (struct network_activity *) malloc(sizeof(struct network_activity));
+  int                       payload_size = NLMSG_SPACE(sizeof(struct network_activity));
+
   this->send_hand_check();
 
-  Thread::start();
-}
+  LOG4CXX_DEBUG(logger, "Payload size is " << payload_size);
 
-void NetlinkListener::execute(void)
-{
-  struct msghdr       msg;
-  struct iovec        iov;
-  struct network_activity * activity_struct = (struct network_activity *) malloc(sizeof(struct network_activity));
-
-  LOG4CXX_DEBUG(logger, "NetlinkListener is now listening to the LKM");
-
+  LOG4CXX_DEBUG(logger, "Entering LKM communication loop...");
   this->running = true;
   while (this->running)
   {
-    struct nlmsghdr *   nlh = (struct nlmsghdr *) malloc(NLMSG_SPACE(sizeof(struct network_activity)));
+    // nlh is malloc'ed and free'ed for each messages from the kernel
+    struct nlmsghdr * nlh = (struct nlmsghdr *) malloc(payload_size);
 
-    iov.iov_base = (void *)nlh;
-    iov.iov_len = nlh->nlmsg_len;
+    // nlh initialization
+    memset(nlh, 0, payload_size);
+    nlh->nlmsg_len = payload_size;
+    nlh->nlmsg_pid = getpid();
+    nlh->nlmsg_flags = 0;
+
+    // msg initialization
+    iov.iov_base  = (void *)nlh;
+    iov.iov_len   = nlh->nlmsg_len;
 
     memset(&msg, 0, sizeof(struct msghdr));
-    msg.msg_name = (void *)&destination_address;
+    msg.msg_name    = (void *)&this->destination_address;
     msg.msg_namelen = sizeof(struct sockaddr_nl);
-    msg.msg_iov = &iov;
-    msg.msg_iovlen = 1;
-
-    memset(nlh, 0, NLMSG_SPACE(sizeof(struct network_activity)));
+    msg.msg_iov     = &iov;
+    msg.msg_iovlen  = 1;
 
     if (recvmsg(this->sock_fd, &msg, MSG_WAITALL) > 0)
     {
@@ -82,21 +85,10 @@ void NetlinkListener::die(void)
   this->running = false;
 }
 
-void NetlinkListener::send_hand_check(void)
-{
-  // Build a new message
-  struct network_activity * activity = this->build_message(KIND_HAND_CHECK);
-  // Assign some values
-  strcpy(activity->devise_name, "lo");
-
-  LOG4CXX_DEBUG(logger, "NetlinkListener is sending the hand check");
-
-  // Send it to the Kernel module
-  this->send_message(activity);
-}
-
 void NetlinkListener::send_rule(const Rule * rule)
 {
+  LOG4CXX_DEBUG(logger, "NetlinkListener::send_rule...");
+
   // Build a new message
   struct network_activity * activity = this->build_message(KIND_SENDING_RULE);
 
@@ -139,8 +131,36 @@ void NetlinkListener::say_goodbye(void)
   this->send_message(activity);
 }
 
+/*
+** Signals methods
+*/
+boost::signals2::connection NetlinkListener::on_connected_to_kernel_module_connect(const signalConnectedToKernelModuleType &slot)
+{
+  return connected_to_kernel_module.connect(slot);
+}
+
+NetlinkListener::signalConnectedToKernelModule NetlinkListener::connected_to_kernel_module;
+
+/*
+** Private
+*/
+
+void NetlinkListener::send_hand_check(void)
+{
+  // Build a new message
+  struct network_activity * activity = this->build_message(KIND_HAND_CHECK);
+  // Assign some values
+  strcpy(activity->devise_name, "lo");
+
+  LOG4CXX_DEBUG(logger, "NetlinkListener is sending the hand check");
+
+  // Send it to the Kernel module
+  this->send_message(activity);
+}
+
 struct network_activity * NetlinkListener::build_message(int kind)
 {
+  LOG4CXX_DEBUG(logger, "NetlinkListener::build_message...");
   struct network_activity * activity = (struct network_activity *) malloc(sizeof(struct network_activity));
 
   memset(activity, 0, sizeof(struct network_activity));
@@ -182,10 +202,3 @@ void NetlinkListener::send_message(struct network_activity * activity)
       this->connected_to_kernel_module();
   }
 }
-
-boost::signals2::connection NetlinkListener::on_connected_to_kernel_module_connect(const signalConnectedToKernelModuleType &slot)
-{
-  return connected_to_kernel_module.connect(slot);
-}
-
-NetlinkListener::signalConnectedToKernelModule NetlinkListener::connected_to_kernel_module;

@@ -13,7 +13,6 @@
 #include <boost/filesystem/path.hpp>        // boost::filesystem::path
 #include <boost/filesystem/operations.hpp>  // boost::filesystem::read_symlink
 #include <sys/stat.h>
-#include "gtk/gtk_process_icon.h"
 #include "tools.h"
 
 /*
@@ -43,7 +42,6 @@ class Process
     */
     const std::string   get_executable_sha256(void) const;
     void                update_executable_sha256(void);
-    void                get_application_icon(void);
 
     /*
     ** Attributes
@@ -52,7 +50,6 @@ class Process
     std::string         executable_name;
     std::string         icon_name;
     std::string         printable_name;
-    GtkProcessIcon      icon;
 
   private:
     log4cxx::LoggerPtr  logger;

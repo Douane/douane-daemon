@@ -43,6 +43,10 @@ const Process * ProcessesManager::find_or_create_from_path(const std::string & p
   }
 }
 
+/*
+** Private
+*/
+
 Process * ProcessesManager::make_new_process(Process * new_process)
 {
   const DesktopFile * desktop_file = this->desktop_files->find_desktop_file_by_application_name(new_process->executable_name);
@@ -62,9 +66,6 @@ Process * ProcessesManager::make_new_process(Process * new_process)
   // Default icon (when no one defined in a DesktopFile)
   if (new_process->icon_name == "")
     new_process->icon_name = "image-missing";
-
-  // Set the process icon from icon_name or executable_name
-  new_process->get_application_icon();
 
   // Save that new process
   this->processes.insert(std::pair<const std::string&, const Process&>(new_process->path, *new_process));

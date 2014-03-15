@@ -36,6 +36,10 @@ void Thread::wait_for_exit(void)
   pthread_join(handle, NULL);
 }
 
+/*
+** Private
+*/
+
 // method which starts the new thread
 void Thread::create(bool detach)
 {

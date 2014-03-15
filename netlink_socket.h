@@ -3,6 +3,8 @@
 
 #include "socket.h"
 
+#define MAX_NL_MSG_LEN 1024
+
 /*
 **  Communicate with the Kernel module.
 */

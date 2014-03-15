@@ -1,38 +1,50 @@
+// Basic includes
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
 #include <getopt.h>
 #include <boost/bind.hpp>
 #include <signal.h>
-#include <gtkmm/application.h>
-
-#include "freedesktop/desktop_files.h"
-#include "rules_manager.h"
-#include "gtk/gtk_question_window.h"
-#include "netlink_listener.h"
-#include "processes_manager.h"
-// #include "dns_client.h"
-#include "dbus_server.h"
-
+// Log4cxx includes
 #include <log4cxx/logger.h>
 #include <log4cxx/helpers/pool.h>
 #include <log4cxx/basicconfigurator.h>
 #include <log4cxx/fileappender.h>
 #include <log4cxx/patternlayout.h>
-log4cxx::LoggerPtr logger = log4cxx::Logger::getLogger("Main");
 
+// Douane internal includes
+#include "freedesktop/desktop_files.h"
+#include "rules_manager.h"
+#include "netlink_listener.h"
+#include "processes_manager.h"
+#include "dbus_server.h"
+
+// In the case the Makefile didn't initialized the VERSION variable
+// this code initialize it to "UNKNOWN"
 #ifndef DOUANE_VERSION
 #define DOUANE_VERSION "UNKNOWN"
 #endif
 
+// Daemon flags and paths
 bool          enabled_debug = false;
 bool          has_to_daemonize = false;
 bool          has_to_write_pid_file = false;
 const char *  pid_file_path = "/var/run/douaned.pid";
 const char *  log_file_path = "/var/log/douane.log";
 
+// Initialize the logger for the current file
+log4cxx::LoggerPtr logger = log4cxx::Logger::getLogger("Main");
+
+/* Global initialization
+**
+*  This is needed in order to access it from the main() method
+*  but also from others like handler()
+*/
 NetlinkListener netlink_listener;
 
+/*
+** Handle the exit signal
+*/
 void handler(int sig)
 {
   LOG4CXX_INFO(logger, "Exiting Douane daemon with signal " << sig << "...");
@@ -40,6 +52,11 @@ void handler(int sig)
   exit(1);
 }
 
+/*
+** Create a daemon from the current instance
+*
+*  This is executed when passing argument -d
+*/
 void do_daemonize(void)
 {
   // Create child process
@@ -71,18 +88,33 @@ void do_daemonize(void)
   }
 }
 
+/*
+** Print the daemon version
+*
+*  This is executed when passing argument -v
+*/
 void do_version(void)
 {
   std::cout << DOUANE_VERSION << std::endl;
   exit(1);
 }
 
+/*
+** Print the help menu
+*
+*  This is executed when passing argument -h
+*/
 void do_help(void)
 {
   std::cout << "TODO: Write help message" << std::endl;
   exit(1);
 }
 
+/*
+** Create the PID file and write the PID
+*
+*  This is executed when passing argument -p
+*/
 void do_pidfile(const char * path)
 {
   std::ofstream pid_file;
@@ -123,18 +155,6 @@ void do_from_options(std::string option, const char * optarg)
   {
     enabled_debug = true;
   }
-}
-
-/*
-**  In order to accept arguments when initializing application with Gtk::Application::create
-*  the flag Gio::APPLICATION_HANDLES_COMMAND_LINE has been passed and so we have to implement
-*  that callback method that will just activate the application and don't do anything as arguments
-*  are supported by getopt.h
-*/
-int on_cmd(const Glib::RefPtr<Gio::ApplicationCommandLine> &, Glib::RefPtr<Gtk::Application> &application)
-{
-  application->activate();
-  return 0;
 }
 
 int main(int argc, char * argv[])
@@ -233,44 +253,25 @@ int main(int argc, char * argv[])
     if (enabled_debug)
       LOG4CXX_DEBUG(logger, "The debug mode is enabled");
 
-
-    LOG4CXX_DEBUG(logger, "Gtk::Application::create()");
-    // Standard Gtkmm initialization of the application that will be used to execute the GTK stuff
-    Glib::RefPtr<Gtk::Application>  application = Gtk::Application::create(
-      argc,
-      argv,
-      "org.zedroot.Douane.Application",
-      Gio::APPLICATION_HANDLES_COMMAND_LINE | Gio::APPLICATION_IS_SERVICE
-    );
-    application->signal_command_line().connect(sigc::bind(sigc::ptr_fun(on_cmd), application), false);
-
-    LOG4CXX_DEBUG(logger, "Initializing GTK window");
-    GtkQuestionWindow         gtk_question_window(application);
-
     /*
-    **  DesktopFiles is a manager for freedesktop.org files
+    ** DesktopFiles is a manager for freedesktop.org files
     *  (http://standards.freedesktop.org/autostart-spec/autostart-spec-latest.html#id2695912)
+    *
+    *  It is used in order to find caught network activity process information like the icon
     */
     LOG4CXX_DEBUG(logger, "Initializing DesktopFiles");
     DesktopFiles          desktop_files;
 
     /*
-    **  RulesManager is a "rules engine" that is responsible to store, ask and synchronize rules
+    ** RulesManager is a "rules engine" that is responsible to store, ask and synchronize rules
     *  with the kernel module
     */
     LOG4CXX_DEBUG(logger, "Initializing RulesManager");
     RulesManager          rules_manager;
     LOG4CXX_DEBUG(logger, "rules_manager: " << &rules_manager);
 
-    // DnsCache           dns_cache;
-
-    // When DnsClient emit looking_up_for_new_address signal then fire DnsCache::lookup_from_cache
-    // DnsClient::on_looking_up_for_new_address_connect(boost::bind(&DnsCache::lookup_from_cache, &dns_cache, _1));
-    // When DnsClient emit ip_address_resolution_done signal then fire DnsCache::update_cache
-    // DnsClient::on_ip_address_resolution_done_connect(boost::bind(&DnsCache::update_cache, &dns_cache, _1, _2));
-
     LOG4CXX_DEBUG(logger, "Initializing ProcessesManager");
-    ProcessesManager        processes_manager;
+    ProcessesManager      processes_manager;
     processes_manager.set_desktop_files(&desktop_files);
 
     // Assign the ProcessesManager instance to the NetlinkListener
@@ -285,17 +286,23 @@ int main(int argc, char * argv[])
     NetlinkMessageHandler::on_new_network_activity_connect(boost::bind(&RulesManager::lookup_activity, &rules_manager, _1));
 
     // When RulesManager emit new_unknown_activity signal then fire GtkQuestionWindow::add_activity
-    rules_manager.on_new_unknown_activity_connect(boost::bind(&GtkQuestionWindow::add_activity, &gtk_question_window, _1));
+    //
+    // TODO: Emit a signal to the external process which will popup a dialog and ask the user to allow/deny the activity
+    // rules_manager.on_new_unknown_activity_connect(boost::bind(&GtkQuestionWindow::add_activity, &gtk_question_window, _1));
 
     // When GtkQuestionWindow emit new_rule_validated signal then fire RulesManager::make_rule_from
-    gtk_question_window.on_new_rule_validated_connect(boost::bind(&RulesManager::make_rule_from, &rules_manager, _1, _2));
+    //
+    // TODO: Receive a signal from the external process which has popup a dialog to define if user allowed/denied the activity
+    // gtk_question_window.on_new_rule_validated_connect(boost::bind(&RulesManager::make_rule_from, &rules_manager, _1, _2));
 
     // When RulesManager emit new_network_activity signal then fire NetlinkListener::send_rule
     rules_manager.on_new_rule_created_connect(boost::bind(&NetlinkListener::send_rule, &netlink_listener, _1));
 
     // When RulesManager emit rule_deleted signal then fire NetlinkListener::delete_rule
     rules_manager.on_rule_deleted_connect(boost::bind(&NetlinkListener::delete_rule, &netlink_listener, _1));
-    rules_manager.on_rule_deleted_connect(boost::bind(&GtkQuestionWindow::forget_unknown_application, &gtk_question_window, _1));
+    //
+    // TODO: Emit a signal to the external process which will popup a dialog to ignore the activity
+    //rules_manager.on_rule_deleted_connect(boost::bind(&GtkQuestionWindow::forget_unknown_application, &gtk_question_window, _1));
 
     /*
     ** D-Bus server initialization to publish data to external applications
@@ -309,12 +316,16 @@ int main(int argc, char * argv[])
     // Start into a thread the D-Bus server
     dbus_server.start();
 
-    // Connect and listen to the Linux Kernel Module
-    LOG4CXX_DEBUG(logger, "Starting to listen to LKM");
+    /* Connect and listen to the Linux Kernel Module
+    **
+    *  The NetlinkListener is the core of the daemon.
+    *  This means that the following start() method is the method which will runs until the daemon has to die.
+    */
+    LOG4CXX_DEBUG(logger, "Starting to listen to LKM. Daemon is alive!");
     netlink_listener.start();
 
-    LOG4CXX_DEBUG(logger, "Entering GTK loop");
-    return application->run(gtk_question_window);
+    LOG4CXX_DEBUG(logger, "Daemon is dying...");
+    return EXIT_SUCCESS;
 
   } catch(const std::exception &e)
   {

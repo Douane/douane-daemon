@@ -9,10 +9,10 @@
 /*
 **  Communicate with the Kernel module.
 */
-class Douane :  public org::zedroot::Douane_adaptor,
-        public DBus::IntrospectableAdaptor,
-        public DBus::PropertiesAdaptor,
-        public DBus::ObjectAdaptor
+class Douane : public org::zedroot::Douane_adaptor,
+             public DBus::IntrospectableAdaptor,
+             public DBus::PropertiesAdaptor,
+             public DBus::ObjectAdaptor
 {
   public:
     /*

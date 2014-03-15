@@ -28,7 +28,6 @@ class Tools
     const std::string   make_sha256_from(const std::string & path) const;
     bool                is_number(const std::string& s) const;
     const std::string   douane_root_path(void) const;
-    const std::string   douane_data_path(void) const;
 
   private:
     log4cxx::LoggerPtr  logger;

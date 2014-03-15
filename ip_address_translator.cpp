@@ -11,6 +11,15 @@ IpAddressTranslator::~IpAddressTranslator(void)
 
 }
 
+const std::string IpAddressTranslator::translate(const std::string &ip_address)
+{
+  return IpAddressTranslator::resolver(ip_address);
+}
+
+/*
+** Private
+*/
+
 const std::string IpAddressTranslator::resolver(const std::string &ip_address)
 {
   struct in_addr ipv4addr;
@@ -18,9 +27,4 @@ const std::string IpAddressTranslator::resolver(const std::string &ip_address)
   struct hostent * he = gethostbyaddr(&ipv4addr, sizeof(ipv4addr), AF_INET);
 
   return he == NULL ? "" : he->h_name;
-}
-
-const std::string IpAddressTranslator::translate(const std::string &ip_address)
-{
-  return IpAddressTranslator::resolver(ip_address);
 }

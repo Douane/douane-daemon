@@ -28,6 +28,10 @@ boost::property_tree::ptree Rule::to_json(void) const
   return rule;
 }
 
+/*
+** Private
+*/
+
 std::string Rule::update_process_name_from_path(void) const
 {
   char path[PATH_MAX * 4] = "";
