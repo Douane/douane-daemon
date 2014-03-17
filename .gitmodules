@@ -1,0 +1,3 @@
+[submodule "dbus/interface"]
+	path = dbus/interface
+	url = git@git.zedroot.org:zedtux/douane-dbus.git
