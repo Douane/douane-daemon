@@ -2,7 +2,7 @@
 #define DOUANE_H
 
 #include <log4cxx/logger.h>
-#include "interface/org_zedroot_douane.h"
+#include "interface/org_zedroot_douane_adaptor.h"
 #include "../network_activity.h"
 #include "../rules_manager.h"
 
