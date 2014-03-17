@@ -17,7 +17,7 @@
 #include "freedesktop/desktop_files.h"
 #include "rules_manager.h"
 #include "processes_manager.h"
-#include "dbus_server.h"
+#include "dbus/dbus_server.h"
 #include "douane_external_dialog.h"
 
 // In the case the Makefile didn't initialized the VERSION variable

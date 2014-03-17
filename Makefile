@@ -7,8 +7,8 @@ LDFLAGS=$(PKGCONFIG) -lboost_signals -lboost_system -lboost_filesystem -lboost_r
 
 OBJ=freedesktop/desktop_file.o \
 	freedesktop/desktop_files.o \
-	dbus_server.o \
-	douane.o \
+	dbus/dbus_server.o \
+	dbus/douane.o \
 	douane_external_dialog.o \
 	main.o \
 	netlink_listener.o \

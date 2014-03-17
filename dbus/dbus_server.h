@@ -4,8 +4,8 @@
 #include <log4cxx/logger.h>
 #include <dbus-c++/dbus.h>
 #include "douane.h"
-#include "thread.h"
-#include "network_activity.h"
+#include "../thread.h"
+#include "../network_activity.h"
 
 #define DOUANE_SERVER_NAME "org.zedroot.Douane"
 

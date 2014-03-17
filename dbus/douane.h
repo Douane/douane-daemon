@@ -2,9 +2,9 @@
 #define DOUANE_H
 
 #include <log4cxx/logger.h>
-#include "org_zedroot_douane.h"
-#include "network_activity.h"
-#include "rules_manager.h"
+#include "../org_zedroot_douane.h"
+#include "../network_activity.h"
+#include "../rules_manager.h"
 
 /*
 **  Communicate with the Kernel module.
