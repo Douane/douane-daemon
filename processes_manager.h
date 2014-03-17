@@ -7,6 +7,13 @@
 #include "freedesktop/desktop_files.h"
 #include "freedesktop/desktop_file.h"
 
+/*
+** ProcessesManager is container for the Process(es).
+*
+*  When an unknown process is detected, a Process instance is created
+*  and this instance remains in memory (performance reason).
+*  The manager instanciate, store and provide the Process instances.
+*/
 class ProcessesManager
 {
   public:

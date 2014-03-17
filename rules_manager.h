@@ -10,18 +10,22 @@
 #include "network_activity.h"
 #include "tools.h"
 
+/*
+** RulesManager is a "rules engine" that is responsible to store, ask and synchronize rules
+*  with the kernel module
+*/
 class RulesManager
 {
   public:
     /*
     ** Signals
     */
-    typedef boost::signals2::signal<void(const Rule*)>              signalNewRuleCreated;
-    typedef signalNewRuleCreated::slot_type                         signalNewRuleCreatedType;
-    typedef boost::signals2::signal<void(const Rule*)>              signalRuleDeleted;
-    typedef signalRuleDeleted::slot_type                            signalRuleDeletedType;
-    typedef boost::signals2::signal<void(const NetworkActivity *)>  signalNewUnknownActivity;
-    typedef signalNewUnknownActivity::slot_type                     signalNewUnknownActivityType;
+    typedef boost::signals2::signal<void(const Rule*)>  signalNewRuleCreated;
+    typedef signalNewRuleCreated::slot_type             signalNewRuleCreatedType;
+    typedef boost::signals2::signal<void(const Rule*)>  signalRuleDeleted;
+    typedef signalRuleDeleted::slot_type                signalRuleDeletedType;
+    typedef boost::signals2::signal<void()>             signalNewUnknownActivity;
+    typedef signalNewUnknownActivity::slot_type         signalNewUnknownActivityType;
 
     /*
     ** Constructors and Destructor

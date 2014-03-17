@@ -13,11 +13,12 @@
 #include <log4cxx/patternlayout.h>
 
 // Douane internal includes
+#include "netlink_listener.h"
 #include "freedesktop/desktop_files.h"
 #include "rules_manager.h"
-#include "netlink_listener.h"
 #include "processes_manager.h"
 #include "dbus_server.h"
+#include "douane_external_dialog.h"
 
 // In the case the Makefile didn't initialized the VERSION variable
 // this code initialize it to "UNKNOWN"
@@ -31,6 +32,7 @@ bool          has_to_daemonize = false;
 bool          has_to_write_pid_file = false;
 const char *  pid_file_path = "/var/run/douaned.pid";
 const char *  log_file_path = "/var/log/douane.log";
+const char *  dialog_process_name = "douane-dialog";
 
 // Initialize the logger for the current file
 log4cxx::LoggerPtr logger = log4cxx::Logger::getLogger("Main");
@@ -154,6 +156,10 @@ void do_from_options(std::string option, const char * optarg)
   } else if (option == "debug")
   {
     enabled_debug = true;
+  } else if (option == "question-window-process")
+  {
+    if (optarg)
+      dialog_process_name = optarg;
   }
 }
 
@@ -171,16 +177,17 @@ int main(int argc, char * argv[])
   int c;
   const struct option long_options[] =
   {
-    {"daemon",   no_argument,       0, 'd'},
-    {"version",  no_argument,       0, 'v'},
-    {"help",     no_argument,       0, 'h'},
-    {"pid-file", optional_argument, 0, 'p'},
-    {"log-file", required_argument, 0, 'l'},
-    {"debug",    no_argument      , 0, 'D'},
+    {"daemon",                  no_argument,       0, 'd'},
+    {"version",                 no_argument,       0, 'v'},
+    {"help",                    no_argument,       0, 'h'},
+    {"pid-file",                optional_argument, 0, 'p'},
+    {"log-file",                required_argument, 0, 'l'},
+    {"question-window-process", required_argument, 0, 'q'},
+    {"debug",                   no_argument      , 0, 'D'},
     {0,0,0,0}
   };
   int option_index = 0;
-  while ((c = getopt_long(argc, argv, "dvhp:l:D", long_options, &option_index)) != -1)
+  while ((c = getopt_long(argc, argv, "dvhp:l:q:D", long_options, &option_index)) != -1)
   {
     switch (c)
     {
@@ -201,6 +208,9 @@ int main(int argc, char * argv[])
         break;
       case 'l':
         do_from_options("log-file", optarg);
+        break;
+      case 'q':
+        do_from_options("question-window-process", optarg);
         break;
       case 'D':
         do_from_options("debug", optarg);
@@ -248,35 +258,36 @@ int main(int argc, char * argv[])
       LOG4CXX_INFO(logger, "A pid file with PID " << getpid() << " is created at " << pid_file_path);
     }
 
-    LOG4CXX_INFO(logger, "A log file is created at " << log_file_path);
+    LOG4CXX_INFO(logger, "The log file is " << log_file_path);
 
     if (enabled_debug)
       LOG4CXX_DEBUG(logger, "The debug mode is enabled");
 
     /*
-    ** DesktopFiles is a manager for freedesktop.org files
-    *  (http://standards.freedesktop.org/autostart-spec/autostart-spec-latest.html#id2695912)
-    *
-    *  It is used in order to find caught network activity process information like the icon
+    ** ~~~~ Global class initializations ~~~~
     */
     LOG4CXX_DEBUG(logger, "Initializing DesktopFiles");
     DesktopFiles          desktop_files;
 
-    /*
-    ** RulesManager is a "rules engine" that is responsible to store, ask and synchronize rules
-    *  with the kernel module
-    */
     LOG4CXX_DEBUG(logger, "Initializing RulesManager");
     RulesManager          rules_manager;
-    LOG4CXX_DEBUG(logger, "rules_manager: " << &rules_manager);
 
     LOG4CXX_DEBUG(logger, "Initializing ProcessesManager");
     ProcessesManager      processes_manager;
     processes_manager.set_desktop_files(&desktop_files);
-
-    // Assign the ProcessesManager instance to the NetlinkListener
     netlink_listener.set_processes_manager(&processes_manager);
 
+    LOG4CXX_DEBUG(logger, "Initializing DBusServer");
+    DBusServer            dbus_server;
+    dbus_server.set_rules_manager(&rules_manager);
+
+    DouaneExternalDialog  douane_external_dialog(dialog_process_name);
+    /*
+    **/
+
+    /*
+    ** ~~~~ Signal connexions ~~~~
+    */
 
     LOG4CXX_DEBUG(logger, "Connecting objects");
     // When NetlinkListener emit connected_to_kernel_module signal then fire RulesManager::push_rules
@@ -285,15 +296,13 @@ int main(int argc, char * argv[])
     // When NetlinkMessageHandler emit new_network_activity signal then fire RulesManager::lookup_activity
     NetlinkMessageHandler::on_new_network_activity_connect(boost::bind(&RulesManager::lookup_activity, &rules_manager, _1));
 
-    // When RulesManager emit new_unknown_activity signal then fire GtkQuestionWindow::add_activity
-    //
-    // TODO: Emit a signal to the external process which will popup a dialog and ask the user to allow/deny the activity
-    // rules_manager.on_new_unknown_activity_connect(boost::bind(&GtkQuestionWindow::add_activity, &gtk_question_window, _1));
+    // When RulesManager emit new_unknown_activity signal then fire the external dialog application
+    rules_manager.on_new_unknown_activity_connect(boost::bind(&DouaneExternalDialog::popup, &douane_external_dialog));
 
     // When GtkQuestionWindow emit new_rule_validated signal then fire RulesManager::make_rule_from
     //
     // TODO: Receive a signal from the external process which has popup a dialog to define if user allowed/denied the activity
-    // gtk_question_window.on_new_rule_validated_connect(boost::bind(&RulesManager::make_rule_from, &rules_manager, _1, _2));
+    // douane_external_dialog.on_new_rule_validated_connect(boost::bind(&RulesManager::make_rule_from, &rules_manager, _1, _2));
 
     // When RulesManager emit new_network_activity signal then fire NetlinkListener::send_rule
     rules_manager.on_new_rule_created_connect(boost::bind(&NetlinkListener::send_rule, &netlink_listener, _1));
@@ -302,18 +311,17 @@ int main(int argc, char * argv[])
     rules_manager.on_rule_deleted_connect(boost::bind(&NetlinkListener::delete_rule, &netlink_listener, _1));
     //
     // TODO: Emit a signal to the external process which will popup a dialog to ignore the activity
-    //rules_manager.on_rule_deleted_connect(boost::bind(&GtkQuestionWindow::forget_unknown_application, &gtk_question_window, _1));
-
-    /*
-    ** D-Bus server initialization to publish data to external applications
-    */
-    DBusServer            dbus_server;
-    dbus_server.set_rules_manager(&rules_manager);
+    //rules_manager.on_rule_deleted_connect(boost::bind(&GtkQuestionWindow::forget_unknown_application, &douane_external_dialog, _1));
 
     // Listener send all received activity to the D-Bus server so that it can fire a signal
     NetlinkMessageHandler::on_new_network_activity_connect(boost::bind(&DBusServer::new_network_activity, &dbus_server, _1));
+    /*
+    **/
 
-    // Start into a thread the D-Bus server
+    /*
+    ** ~~~~ Daemon starting ~~~~
+    */
+    // D-Bus server runs in a thread
     dbus_server.start();
 
     /* Connect and listen to the Linux Kernel Module

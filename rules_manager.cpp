@@ -42,7 +42,7 @@ void RulesManager::lookup_activity(const NetworkActivity * activity)
   {
     if (activity->process_has_been_detected())
     {
-      this->new_unknown_activity(activity);
+      this->new_unknown_activity();
     }
   }
 }

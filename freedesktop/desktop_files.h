@@ -12,6 +12,12 @@
 
 #define DESKTOP_FILES_ROOT_PATH "/usr/share/applications/"
 
+/*
+** DesktopFiles is a manager for freedesktop.org files
+*  (http://standards.freedesktop.org/autostart-spec/autostart-spec-latest.html#id2695912)
+*
+*  It is used in order to find caught network activity process information like the icon
+*/
 class DesktopFiles
 {
   public:
