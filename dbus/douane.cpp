@@ -27,6 +27,9 @@ std::string Douane::RegisterAsDialogProcess(void)
   boost::uuids::uuid uuid = boost::uuids::random_generator()();
   std::string process_id = boost::uuids::to_string(uuid);
 
+  LOG4CXX_DEBUG(logger, "Firing dialog_process_id_update...");
+  this->dialog_process_id_update(process_id);
+
   LOG4CXX_DEBUG(logger, "Returning UUID " << process_id << "...");
   return process_id;
 }
@@ -34,6 +37,10 @@ std::string Douane::RegisterAsDialogProcess(void)
 void Douane::UnregisterDialogProcess(const std::string& process_id)
 {
   LOG4CXX_DEBUG(logger, "Douane::UnregisterDialogProcess...");
+
+  LOG4CXX_DEBUG(logger, "Firing dialog_process_id_update without ID...");
+  this->dialog_process_id_update("");
+
   LOG4CXX_DEBUG(logger, "Passed process_id: " << process_id << "...");
 }
 
@@ -78,3 +85,13 @@ void Douane::emit_new_activity_to_be_validated_signal(const NetworkActivity * ne
   LOG4CXX_DEBUG(logger, "Firing D-Bus signal NewActivityToBeValidated...");
   this->NewActivityToBeValidated(activity);
 }
+
+/*
+** Signals methods
+*/
+boost::signals2::connection Douane::on_dialog_process_id_update_connect(const signalDialogProcessIdUpdateType &slot)
+{
+  return dialog_process_id_update.connect(slot);
+}
+
+Douane::signalDialogProcessIdUpdate Douane::dialog_process_id_update;

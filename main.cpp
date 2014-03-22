@@ -295,6 +295,11 @@ int main(int argc, char * argv[])
 
     // When RulesManager emit new_unknown_activity signal then fire the DBusServer signal NewActivityToBeValidated
     rules_manager.on_new_unknown_activity_connect(boost::bind(&DBusServer::signal_new_unknown_activity, &dbus_server, _1));
+    // When RulesManager emit new_unknown_activity signal then fire the DouaneExternalDialog::popup_if_needed
+    rules_manager.on_new_unknown_activity_connect(boost::bind(&DouaneExternalDialog::popup_if_needed, &douane_external_dialog, _1));
+
+    // When Douane emit dialog_process_id_update signal then fire the DouaneExternalDialog::update_process_id
+    Douane::on_dialog_process_id_update_connect(boost::bind(&DouaneExternalDialog::update_process_id, &douane_external_dialog, _1));
 
     // When GtkQuestionWindow emit new_rule_validated signal then fire RulesManager::make_rule_from
     //

@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <log4cxx/logger.h>
+#include "network_activity.h"
 
 /*
 ** Interface to launch the external process which display
@@ -22,12 +23,14 @@ class DouaneExternalDialog
     /*
     ** Instance methods
     */
-    void                popup(void);
+    void                popup_if_needed(const NetworkActivity *);
+    void                update_process_id(const std::string &process_id);
 
   private:
     log4cxx::LoggerPtr  logger;
     bool                idle;
     const std::string   dialog_process_name;
+    std::string         current_process_id;
 
     /*
     ** Instance methods
