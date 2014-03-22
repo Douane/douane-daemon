@@ -135,16 +135,13 @@ void do_from_options(std::string option, const char * optarg)
   if (option == "daemon")
   {
     has_to_daemonize = true;
-  }
-  else if (option == "version")
+  } else if (option == "version")
   {
     do_version();
-  }
-  else if (option == "help")
+  } else if (option == "help")
   {
     do_help();
-  }
-  else if (option == "pid-file")
+  } else if (option == "pid-file")
   {
     has_to_write_pid_file = true;
     if (optarg)
@@ -230,7 +227,7 @@ int main(int argc, char * argv[])
   *  Appending logs to the file /var/log/douane.log
   */
   log4cxx::PatternLayoutPtr pattern = new log4cxx::PatternLayout(
-    enabled_debug ? "%d{dd/MM/yyyy HH:mm:ss} | %5p | [%F::%c:%L]: %m%n" : "%d{dd/MM/yyyy HH:mm:ss} %5p: %m%n"
+    enabled_debug ? "%d{dd/MM/yyyy HH:mm:ss} | daemon | %5p | [%F::%c:%L]: %m%n" : "%d{dd/MM/yyyy HH:mm:ss} %5p: %m%n"
   );
   log4cxx::FileAppender * fileAppender = new log4cxx::FileAppender(
     log4cxx::LayoutPtr(pattern),
@@ -296,8 +293,8 @@ int main(int argc, char * argv[])
     // When NetlinkMessageHandler emit new_network_activity signal then fire RulesManager::lookup_activity
     NetlinkMessageHandler::on_new_network_activity_connect(boost::bind(&RulesManager::lookup_activity, &rules_manager, _1));
 
-    // When RulesManager emit new_unknown_activity signal then fire the external dialog application
-    rules_manager.on_new_unknown_activity_connect(boost::bind(&DouaneExternalDialog::popup, &douane_external_dialog));
+    // When RulesManager emit new_unknown_activity signal then fire the DBusServer signal NewActivityToBeValidated
+    rules_manager.on_new_unknown_activity_connect(boost::bind(&DBusServer::signal_new_unknown_activity, &dbus_server, _1));
 
     // When GtkQuestionWindow emit new_rule_validated signal then fire RulesManager::make_rule_from
     //

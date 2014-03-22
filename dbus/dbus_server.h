@@ -27,6 +27,7 @@ class DBusServer : public Thread
     void                set_rules_manager(RulesManager * rules_manager);
     void                execute(void);
     void                new_network_activity(NetworkActivity *) const;
+    void                signal_new_unknown_activity(const NetworkActivity *) const;
 
   private:
     log4cxx::LoggerPtr  logger;

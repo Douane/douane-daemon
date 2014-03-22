@@ -48,4 +48,4 @@ install: $(EXEC)
 	test -d $(DESTDIR)/etc/dbus-1/system.d/ || mkdir -p $(DESTDIR)/etc/dbus-1/system.d/
 	install -m 0500 $(EXEC) $(BINDIR)
 	install -m 0755 init.d/douane $(DESTDIR)/etc/init.d/
-	install -m 0644 system.d/douane.conf $(DESTDIR)/etc/dbus-1/system.d/
+	install -m 0644 system.d/org.zedroot.Douane.conf $(DESTDIR)/etc/dbus-1/system.d/
