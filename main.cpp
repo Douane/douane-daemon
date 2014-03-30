@@ -18,7 +18,6 @@
 #include "rules_manager.h"
 #include "processes_manager.h"
 #include "dbus/dbus_server.h"
-#include "douane_external_dialog.h"
 
 // In the case the Makefile didn't initialized the VERSION variable
 // this code initialize it to "UNKNOWN"
@@ -32,7 +31,6 @@ bool          has_to_daemonize = false;
 bool          has_to_write_pid_file = false;
 const char *  pid_file_path = "/var/run/douaned.pid";
 const char *  log_file_path = "/var/log/douane.log";
-const char *  dialog_process_name = "douane-dialog";
 
 // Initialize the logger for the current file
 log4cxx::LoggerPtr logger = log4cxx::Logger::getLogger("Main");
@@ -153,10 +151,6 @@ void do_from_options(std::string option, const char * optarg)
   } else if (option == "debug")
   {
     enabled_debug = true;
-  } else if (option == "question-window-process")
-  {
-    if (optarg)
-      dialog_process_name = optarg;
   }
 }
 
@@ -174,17 +168,16 @@ int main(int argc, char * argv[])
   int c;
   const struct option long_options[] =
   {
-    {"daemon",                  no_argument,       0, 'd'},
-    {"version",                 no_argument,       0, 'v'},
-    {"help",                    no_argument,       0, 'h'},
-    {"pid-file",                optional_argument, 0, 'p'},
-    {"log-file",                required_argument, 0, 'l'},
-    {"question-window-process", required_argument, 0, 'q'},
-    {"debug",                   no_argument      , 0, 'D'},
+    {"daemon",    no_argument,       0, 'd'},
+    {"version",   no_argument,       0, 'v'},
+    {"help",      no_argument,       0, 'h'},
+    {"pid-file",  optional_argument, 0, 'p'},
+    {"log-file",  required_argument, 0, 'l'},
+    {"debug",     no_argument      , 0, 'D'},
     {0,0,0,0}
   };
   int option_index = 0;
-  while ((c = getopt_long(argc, argv, "dvhp:l:q:D", long_options, &option_index)) != -1)
+  while ((c = getopt_long(argc, argv, "dvhp:l:D", long_options, &option_index)) != -1)
   {
     switch (c)
     {
@@ -205,9 +198,6 @@ int main(int argc, char * argv[])
         break;
       case 'l':
         do_from_options("log-file", optarg);
-        break;
-      case 'q':
-        do_from_options("question-window-process", optarg);
         break;
       case 'D':
         do_from_options("debug", optarg);
@@ -277,8 +267,6 @@ int main(int argc, char * argv[])
     LOG4CXX_DEBUG(logger, "Initializing DBusServer");
     DBusServer            dbus_server;
     dbus_server.set_rules_manager(&rules_manager);
-
-    DouaneExternalDialog  douane_external_dialog(dialog_process_name);
     /*
     **/
 
@@ -295,11 +283,6 @@ int main(int argc, char * argv[])
 
     // When RulesManager emit new_unknown_activity signal then fire the DBusServer signal NewActivityToBeValidated
     rules_manager.on_new_unknown_activity_connect(boost::bind(&DBusServer::signal_new_unknown_activity, &dbus_server, _1));
-    // When RulesManager emit new_unknown_activity signal then fire the DouaneExternalDialog::popup_if_needed
-    rules_manager.on_new_unknown_activity_connect(boost::bind(&DouaneExternalDialog::popup_if_needed, &douane_external_dialog, _1));
-
-    // When Douane emit dialog_process_id_update signal then fire the DouaneExternalDialog::update_process_id
-    Douane::on_dialog_process_id_update_connect(boost::bind(&DouaneExternalDialog::update_process_id, &douane_external_dialog, _1));
 
     // When GtkQuestionWindow emit new_rule_validated signal then fire RulesManager::make_rule_from
     //

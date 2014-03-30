@@ -9,7 +9,6 @@ OBJ=freedesktop/desktop_file.o \
 	freedesktop/desktop_files.o \
 	dbus/dbus_server.o \
 	dbus/douane.o \
-	douane_external_dialog.o \
 	main.o \
 	netlink_listener.o \
 	netlink_message_handler.o \
