@@ -16,6 +16,7 @@ DOUANEDIR=/opt/douane
 DAEMON=$DOUANEDIR/$NAME
 PIDDIR=$DOUANEDIR/pids
 PIDFILE=$PIDDIR/$NAME.pid
+DOUANEOPTIONS="-D"
 
 case "$1" in
     start)
@@ -27,7 +28,7 @@ case "$1" in
             mkdir $PIDDIR
             chown root $PIDDIR
         fi
-        FULL_COMMAND="start-stop-daemon --start --oknodo --startas $DAEMON --make-pidfile --background --umask 0 --nicelevel -20 --pidfile $PIDFILE"
+        FULL_COMMAND="start-stop-daemon --start --oknodo --startas $DAEMON --make-pidfile --background --umask 0 --nicelevel -20 --pidfile $PIDFILE -- $DOUANEOPTIONS"
         [[ x"$DAEMON_USER" != x ]] && sudo -u $DAEMON_USER $FULL_COMMAND || $FULL_COMMAND
         log_end_msg $?
         ;;
