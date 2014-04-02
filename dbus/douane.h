@@ -22,8 +22,8 @@ class Douane : public org::zedroot::Douane_adaptor,
     /*
     ** Signals
     */
-    typedef boost::signals2::signal<void(const std::string)>                signalDialogProcessIdUpdate;
-    typedef signalDialogProcessIdUpdate::slot_type                          signalDialogProcessIdUpdateType;
+    typedef boost::signals2::signal<void(const std::string&, const bool)>   signalNewRuleReceived;
+    typedef signalNewRuleReceived::slot_type                                signalNewRuleReceivedType;
 
     /*
     ** Constructors and Destructor
@@ -39,18 +39,19 @@ class Douane : public org::zedroot::Douane_adaptor,
     void                                                                    UnregisterDialogProcess(const std::string& process_id);
     virtual std::vector< ::DBus::Struct< std::string, std::string, bool > > GetRules(void);
     virtual bool                                                            DeleteRule(const std::string& rule_id);
+    virtual void                                                            CreateRule(const std::string& rule_id, const bool& allow);
     void                                                                    emit_new_activity_to_be_validated_signal(const NetworkActivity * network_activity);
 
     /*
     ** Signals methods
     */
-    static boost::signals2::connection                                      on_dialog_process_id_update_connect(const signalDialogProcessIdUpdateType &slot);
+    static boost::signals2::connection                                      on_new_rule_received_connect(const signalNewRuleReceivedType &slot);
 
   private:
     log4cxx::LoggerPtr                                                      logger;
     RulesManager *                                                          rules_manager;
 
-    static signalDialogProcessIdUpdate                                      dialog_process_id_update;
+    static signalNewRuleReceived                                            new_rule_received;
 };
 
 #endif

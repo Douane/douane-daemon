@@ -38,8 +38,9 @@ class RulesManager
     */
     const std::map<std::string, const Rule>                         get_valid_rules(void) const;
     const Rule *                                                    search_valid_rule_for(const NetworkActivity * activity) const;
+    void                                                            store_pending_rule_from_activity(const NetworkActivity * activity);
     void                                                            lookup_activity(const NetworkActivity * activity);
-    void                                                            make_rule_from(const NetworkActivity * activity, bool allow);
+    void                                                            make_rule_from(const std::string& executable_sha256, const bool allow);
     int                                                             save_rules(void) const;
     int                                                             load_rules_from_file(void);
     void                                                            push_rules(void) const;

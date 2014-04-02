@@ -94,9 +94,9 @@ void NetlinkListener::send_rule(const Rule * rule)
 
   if (rule->is_allowed())
   {
-    LOG4CXX_DEBUG(logger, "NetlinkListener::send_rule ALLOW for " << activity->process_path);
+    LOG4CXX_DEBUG(logger, "NetlinkListener::send_rule ALLOW for " << rule->process_path);
   } else {
-    LOG4CXX_DEBUG(logger, "NetlinkListener::send_rule DISALLOW for " << activity->process_path);
+    LOG4CXX_DEBUG(logger, "NetlinkListener::send_rule DISALLOW for " << rule->process_path);
   }
 
   // Assign some values

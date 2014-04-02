@@ -35,6 +35,28 @@ const Rule * RulesManager::search_valid_rule_for(const NetworkActivity * activit
   }
 }
 
+/*
+** Create a pending rule entry in the case the given NetworkActivity
+*  is not in the valid_rules or in the pending_rules.
+*
+*  The pending_rules are used later when user validate a rule from a GUI.
+*/
+void RulesManager::store_pending_rule_from_activity(const NetworkActivity * activity)
+{
+  std::string executable_sha256 = activity->process->get_executable_sha256();
+
+  std::map<std::string, Rule>::const_iterator it_pending = this->pending_rules.find(executable_sha256);
+  std::map<std::string, const Rule>::const_iterator it_valids = this->valid_rules.find(executable_sha256);
+
+  if (it_pending == this->pending_rules.end() && it_valids == this->valid_rules.end())
+  {
+    // In the case, for the given NetworkActivity, no pending or valid rule exists
+    // insert it in the pending_rules map.
+    this->pending_rules.insert(std::make_pair(executable_sha256, Rule(executable_sha256, activity->process->path, false)));
+  }
+  LOG4CXX_INFO(logger, "Currently " << this->pending_rules.size() << " pending rules");
+}
+
 void RulesManager::lookup_activity(const NetworkActivity * activity)
 {
   const Rule * rule = this->search_valid_rule_for(activity);
@@ -42,15 +64,29 @@ void RulesManager::lookup_activity(const NetworkActivity * activity)
   {
     if (activity->process_has_been_detected())
     {
+      this->store_pending_rule_from_activity(activity);
       this->new_unknown_activity(activity);
     }
   }
 }
 
-
-void RulesManager::make_rule_from(const NetworkActivity * activity, bool allow)
+void RulesManager::make_rule_from(const std::string& executable_sha256, const bool allow)
 {
-  this->make_rule(activity->process->get_executable_sha256(), activity->process->path, allow);
+  // Search in the pending_rules map
+  std::map<std::string, Rule>::iterator it = this->pending_rules.find(executable_sha256);
+  if (it == this->pending_rules.end())
+  {
+    LOG4CXX_WARN(logger, "Received a request to " << (allow ? "allow" : " disallow") << " process with SHA256 " << executable_sha256 << " but was unknown.");
+    // The rule must be in the pending_rules map.
+    return;
+  }
+
+  // Create a valid and permanent rule
+  this->make_rule(executable_sha256, it->second.process_path, allow);
+
+  // Remove the pending rule
+  this->pending_rules.erase(it);
+  LOG4CXX_INFO(logger, "Currently " << this->pending_rules.size() << " pending rules");
 
   // Write rules on disk
   this->save_rules();

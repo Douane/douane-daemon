@@ -284,10 +284,8 @@ int main(int argc, char * argv[])
     // When RulesManager emit new_unknown_activity signal then fire the DBusServer signal NewActivityToBeValidated
     rules_manager.on_new_unknown_activity_connect(boost::bind(&DBusServer::signal_new_unknown_activity, &dbus_server, _1));
 
-    // When GtkQuestionWindow emit new_rule_validated signal then fire RulesManager::make_rule_from
-    //
-    // TODO: Receive a signal from the external process which has popup a dialog to define if user allowed/denied the activity
-    // douane_external_dialog.on_new_rule_validated_connect(boost::bind(&RulesManager::make_rule_from, &rules_manager, _1, _2));
+    // When D-Bus Douane emit new_rule_received signal then fire RulesManager::make_rule_from
+    Douane::on_new_rule_received_connect(boost::bind(&RulesManager::make_rule_from, &rules_manager, _1, _2));
 
     // When RulesManager emit new_network_activity signal then fire NetlinkListener::send_rule
     rules_manager.on_new_rule_created_connect(boost::bind(&NetlinkListener::send_rule, &netlink_listener, _1));
