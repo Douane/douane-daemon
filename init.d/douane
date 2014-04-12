@@ -46,20 +46,6 @@ case "$1" in
         stop
         start
         ;;
-    installautostart)
-        if [ -z "$(grep "modprobe douane" /etc/rc.local)" ]; then
-            sed 's/^exit 0/modprobe douane\n&/' /etc/rc.local | tee /tmp/rc.local;
-            cp /tmp/rc.local /etc;
-            rm /tmp/rc.local;
-        fi
-        ;;
-    uninstallautostart)
-        if [ -n "$(grep "modprobe douane" /etc/rc.local)" ]; then
-            sed '/^modprobe douane/d' /etc/rc.local | tee /tmp/rc.local;
-            cp /tmp/rc.local /etc;
-            rm /tmp/rc.local;
-        fi
-        ;;
     *)
         echo "Unknown argument -- $1"
         echo "Usage:  {start|stop|status|restart}"
