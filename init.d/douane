@@ -43,8 +43,8 @@ case "$1" in
         status_of_proc $DAEMON $NAME
         ;;
     restart)
-        stop
-        start
+        $0 stop
+        $0 start
         ;;
     *)
         echo "Unknown argument -- $1"
