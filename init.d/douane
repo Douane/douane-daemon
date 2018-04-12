@@ -20,7 +20,7 @@ DOUANEOPTIONS="-D"
 
 case "$1" in
     start)
-        log_daemon_msg "Starting the $NAME daemon" 2>/dev/null || echo "Starting the $NAME daemon" 
+        log_daemon_msg "Starting the $NAME daemon" 2>/dev/null || log_success_msg "Starting the $NAME daemon" 
         # Load kernel module if not already loaded
         [[ -z "$(lsmod | grep douane)" ]] && modprobe douane
         # Creating the pids folder is not existing
@@ -30,14 +30,14 @@ case "$1" in
         fi
         FULL_COMMAND="start-stop-daemon --start --oknodo --startas $DAEMON --make-pidfile --background --umask 0 --nicelevel -20 --pidfile $PIDFILE -- $DOUANEOPTIONS"
         [[ x"$DAEMON_USER" != x ]] && sudo -u $DAEMON_USER $FULL_COMMAND || $FULL_COMMAND
-        log_end_msg $? 2>/dev/null || echo $?
+        log_end_msg $? 2>/dev/null || log_success_msg $?
         ;;
     stop)
-        log_daemon_msg "Stopping $NAME daemon"  2>/dev/null || echo "Stopping $NAME daemon"
+        log_daemon_msg "Stopping $NAME daemon"  2>/dev/null || log_success_msg "Stopping $NAME daemon"
         start-stop-daemon --retry 30 --stop --pidfile $PIDFILE
         # Remove PID file is remaining
         [[ -a $PIDFILE ]] && rm $PIDFILE
-        log_end_msg $? 2>/dev/null || echo $?
+        log_end_msg $? 2>/dev/null || log_success_msg $?
         ;;
     status)
         status_of_proc $DAEMON $NAME
