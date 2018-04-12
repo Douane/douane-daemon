@@ -5,6 +5,7 @@
 #
 # Author: Guillaume Hain zedtux@zedroot.org
 #
+# chkconfig: - 01 99
 # description: douane is the daemon process of the Douane firewall application. \
 # This firewall is limiting access to the internet on application bases.
 
