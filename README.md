@@ -1,5 +1,3 @@
 # douane-daemon
 
-This repository contains the daemon process, the brain, of [the Douane firewall application](https://github.com/Douane/Douane), a Linux application firewall.
-
-Find the compilation instructions in [the Compilation Wiki page](https://github.com/Douane/Douane/wiki/Compilation).
+This repository has moved to GitLab. [**Move to the right place now!**](https://gitlab.com/douaneapp/douane-daemon)
